@@ -136,7 +136,7 @@ if __name__ == '__main__':
             soundarray = np.append(soundarray, myrecording)
             myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1)
             if len(soundarray) > save_intervall*fs:
-                soundarray = soundarray[:save_intervall*fs]
+                soundarray = soundarray[-save_intervall*fs:]
             print(np.max(soundarray))
           #  print(soundarray[-100:])
             print(soundarray.shape)
