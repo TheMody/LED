@@ -124,6 +124,8 @@ if __name__ == '__main__':
                 myrecording = np.asarray(myrecording).squeeze()
               #  print(myrecording)
                # print(np.argmax(myrecording==0), buffer_intervall*fs)
+                tolarge = myrecording > 1.0
+                myrecording[tolarge] = 0.0
                 myrecording = myrecording[:np.argmax(myrecording==0)-1]
                 soundarray = np.append(soundarray, myrecording)
                 myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1,dtype='float64')
