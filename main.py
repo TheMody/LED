@@ -113,7 +113,7 @@ if __name__ == '__main__':
     try:
         soundarray = np.asarray([0])
         buffer_intervall = 0.01
-        save_intervall = 10
+        save_intervall = 1
         fs=44100
 
         
@@ -126,9 +126,9 @@ if __name__ == '__main__':
             myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1)
             sd.wait()
             myrecording = np.asarray(myrecording)
-            print("max",np.max(myrecording))
-            print("min",np.min(myrecording))
-            print(myrecording[:10], myrecording[-10:])
+           # print("max",np.max(myrecording))
+          #  print("min",np.min(myrecording))
+         #   print(myrecording[:10], myrecording[-10:])
             # print(np.argmax(myrecording==0), buffer_intervall*fs)
             # tolarge = myrecording > 1.0
             # myrecording[tolarge] = 0.0
@@ -143,7 +143,7 @@ if __name__ == '__main__':
             #print(np.max(soundarray))
             #np.max(soundarray)
             if len(soundarray) > 1000:
-                print(soundarray[-100:])
+              #  print(soundarray[-100:])
                 bright = int((np.mean(soundarray[-100:])+1)*255.0 / 2)
                 print(bright)
                 for i in range(strip.numPixels()):
