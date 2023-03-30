@@ -142,6 +142,7 @@ if __name__ == '__main__':
                 print(bright)
                 for i in range(strip.numPixels()):
                     strip.setPixelColor(i,  Color(bright, bright, bright))
+                strip.show()
            # if (np.max(soundarray) > 0.5):
             #    blink(strip)
  #               myrecording = sd.rec(duration * fs, samplerate=fs, channels=1,dtype='float64')
