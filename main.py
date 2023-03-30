@@ -121,6 +121,7 @@ if __name__ == '__main__':
         while True:	 
             if time.time() -starttime > buffer_intervall:
                 myrecording = np.asarray(myrecording)
+                print(myrecording)
                 print(np.argmax(myrecording==0), buffer_intervall*fs)
                 myrecording = myrecording[:np.argmax(myrecording==0)-1]
                 soundarray = np.append(soundarray, myrecording)
@@ -128,7 +129,7 @@ if __name__ == '__main__':
                 if len(soundarray) > save_intervall*fs:
                     soundarray = soundarray[:save_intervall*fs]
             print(np.max(soundarray))
-            print(soundarray[-100:])
+          #  print(soundarray[-100:])
             print(soundarray.shape)
             #print(np.max(soundarray))
             #np.max(soundarray)
