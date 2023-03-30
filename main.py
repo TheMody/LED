@@ -116,9 +116,20 @@ if __name__ == '__main__':
         save_intervall = 10
         fs=44100
        # duration = 1  # seconds
+        import sounddevice as sd
+        duration = 5.5  # seconds
+
+        def callback(indata, outdata, frames, time, status):
+            if status:
+                print(status)
+            outdata[:] = indata
+
+        with sd.Stream(channels=1, callback=callback):
+            sd.sleep(int(duration * 1000))
+
         myrecording = sd.rec(int(1 * fs), samplerate=fs, channels=1,dtype='float64')
-        while True:
-            print(myrecording)
+     #   while True:
+      #      print(myrecording)
         starttime = time.time()
         while True:	 
             if time.time() -starttime > buffer_intervall:
