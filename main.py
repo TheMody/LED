@@ -116,26 +116,27 @@ if __name__ == '__main__':
         save_intervall = 10
         fs=44100
 
-        myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1,dtype='float64')
-        while True:
-            print(myrecording)
-            print("max",np.max(myrecording))
-            print("min",np.min(myrecording))
+        
+        # for i in range(1000):
+        #     print(myrecording)
+        #     print("max",np.max(myrecording))
+        #     print("min",np.min(myrecording))
        # starttime = time.time()
         while True:	 
-            if not myrecording[-1] == 0:
-                myrecording = np.asarray(myrecording)
-                print("max",np.max(myrecording))
-                print("min",np.min(myrecording))
-                print(myrecording[:10], myrecording[-10:])
-               # print(np.argmax(myrecording==0), buffer_intervall*fs)
-               # tolarge = myrecording > 1.0
-               # myrecording[tolarge] = 0.0
-               # myrecording = myrecording[:np.argmax(myrecording==0)-1]
-                soundarray = np.append(soundarray, myrecording)
-                myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1,dtype='float64')
-                if len(soundarray) > save_intervall*fs:
-                    soundarray = soundarray[:save_intervall*fs]
+            myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1)
+            myrecording.wait()
+            myrecording = np.asarray(myrecording)
+            print("max",np.max(myrecording))
+            print("min",np.min(myrecording))
+            print(myrecording[:10], myrecording[-10:])
+            # print(np.argmax(myrecording==0), buffer_intervall*fs)
+            # tolarge = myrecording > 1.0
+            # myrecording[tolarge] = 0.0
+            # myrecording = myrecording[:np.argmax(myrecording==0)-1]
+            soundarray = np.append(soundarray, myrecording)
+            myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1)
+            if len(soundarray) > save_intervall*fs:
+                soundarray = soundarray[:save_intervall*fs]
             print(np.max(soundarray))
           #  print(soundarray[-100:])
             print(soundarray.shape)
