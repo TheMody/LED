@@ -116,12 +116,12 @@ if __name__ == '__main__':
         save_intervall = 10
         fs=44100
        # duration = 1  # seconds
-        myrecording = sd.rec(buffer_intervall * fs, samplerate=fs, channels=1,dtype='float64')
+        myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1,dtype='float64')
         starttime = time.time()
         while True:	 
             if starttime - time.time() > buffer_intervall:
                 soundarray = np.append(soundarray, myrecording)
-                myrecording = sd.rec(buffer_intervall * fs, samplerate=fs, channels=1,dtype='float64')
+                myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1,dtype='float64')
                 if len(soundarray) > save_intervall*fs:
                     soundarray = soundarray[save_intervall*fs]
             
