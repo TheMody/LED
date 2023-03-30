@@ -124,13 +124,13 @@ if __name__ == '__main__':
                 myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1,dtype='float64')
                 if len(soundarray) > save_intervall*fs:
                     soundarray = soundarray[save_intervall*fs]
-            print(soundarray)
+            print(soundarray[-10:])
             print(soundarray.shape)
             #print(np.max(soundarray))
             #np.max(soundarray)
-            bright = int(np.mean(soundarray[len(soundarray)-100:])*255.0)
-            for i in range(strip.numPixels()):
-                strip.setPixelColor(i,  Color(bright, bright, bright))
+            #bright = int(np.mean(soundarray[len(soundarray)-100:])*255.0)
+           # for i in range(strip.numPixels()):
+          #      strip.setPixelColor(i,  Color(bright, bright, bright))
            # if (np.max(soundarray) > 0.5):
             #    blink(strip)
  #               myrecording = sd.rec(duration * fs, samplerate=fs, channels=1,dtype='float64')
