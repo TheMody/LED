@@ -122,7 +122,8 @@ if __name__ == '__main__':
             if time.time() -starttime > buffer_intervall:
                 starttime = time.time()
                 myrecording = np.asarray(myrecording).squeeze()
-              #  print(myrecording)
+                print("max",np.max(myrecording))
+                print("min",np.min(myrecording))
                # print(np.argmax(myrecording==0), buffer_intervall*fs)
                 tolarge = myrecording > 1.0
                 myrecording[tolarge] = 0.0
