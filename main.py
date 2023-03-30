@@ -122,8 +122,8 @@ if __name__ == '__main__':
             if time.time() -starttime > buffer_intervall:
                 starttime = time.time()
                 myrecording = np.asarray(myrecording).squeeze()
-                print(myrecording)
-                print(np.argmax(myrecording==0), buffer_intervall*fs)
+              #  print(myrecording)
+               # print(np.argmax(myrecording==0), buffer_intervall*fs)
                 myrecording = myrecording[:np.argmax(myrecording==0)-1]
                 soundarray = np.append(soundarray, myrecording)
                 myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1,dtype='float64')
@@ -134,9 +134,9 @@ if __name__ == '__main__':
             print(soundarray.shape)
             #print(np.max(soundarray))
             #np.max(soundarray)
-            #bright = int(np.mean(soundarray[len(soundarray)-100:])*255.0)
-           # for i in range(strip.numPixels()):
-          #      strip.setPixelColor(i,  Color(bright, bright, bright))
+            bright = int(np.mean(soundarray[len(soundarray)-100:])*255.0)
+            for i in range(strip.numPixels()):
+                strip.setPixelColor(i,  Color(bright, bright, bright))
            # if (np.max(soundarray) > 0.5):
             #    blink(strip)
  #               myrecording = sd.rec(duration * fs, samplerate=fs, channels=1,dtype='float64')
