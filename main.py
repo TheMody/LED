@@ -124,7 +124,8 @@ if __name__ == '__main__':
                 myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1,dtype='float64')
                 if len(soundarray) > save_intervall*fs:
                     soundarray = soundarray[save_intervall*fs]
-            
+            print(soundarray)
+            print(soundarray.shape)
             #print(np.max(soundarray))
             #np.max(soundarray)
             bright = int(np.mean(soundarray[len(soundarray)-100:])*255.0)
