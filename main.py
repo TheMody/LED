@@ -124,7 +124,7 @@ if __name__ == '__main__':
        # starttime = time.time()
         while True:	 
             myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1)
-            myrecording.wait()
+            sd.wait()
             myrecording = np.asarray(myrecording)
             print("max",np.max(myrecording))
             print("min",np.min(myrecording))
