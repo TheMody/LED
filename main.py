@@ -144,7 +144,7 @@ if __name__ == '__main__':
             #np.max(soundarray)
             if len(soundarray) > 1000:
               #  print(soundarray[-100:])
-                bright = int(np.max(soundarray[-1000:])*255.0 )
+                bright = np.max(0,int(np.max(soundarray[-1000:])*255.0 ))
                 print(bright)
                 for i in range(strip.numPixels()):
                     strip.setPixelColor(i,  Color(bright, bright, bright))
