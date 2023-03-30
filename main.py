@@ -117,45 +117,22 @@ if __name__ == '__main__':
         fs=44100
 
         
-        # for i in range(1000):
-        #     print(myrecording)
-        #     print("max",np.max(myrecording))
-        #     print("min",np.min(myrecording))
-       # starttime = time.time()
         while True:	 
             myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1)
             sd.wait()
             myrecording = np.asarray(myrecording)
-           # print("max",np.max(myrecording))
-          #  print("min",np.min(myrecording))
-         #   print(myrecording[:10], myrecording[-10:])
-            # print(np.argmax(myrecording==0), buffer_intervall*fs)
-            # tolarge = myrecording > 1.0
-            # myrecording[tolarge] = 0.0
-            # myrecording = myrecording[:np.argmax(myrecording==0)-1]
             soundarray = np.append(soundarray, myrecording)
             myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1)
             if len(soundarray) > save_intervall*fs:
                 soundarray = soundarray[-save_intervall*fs:]
-            print(np.max(soundarray))
-          #  print(soundarray[-100:])
-            print(soundarray.shape)
-            #print(np.max(soundarray))
-            #np.max(soundarray)
+            print(np.max(soundarray[-1000:]))
             if len(soundarray) > 1000:
-              #  print(soundarray[-100:])
-                bright = int(np.max((0,int(np.max(soundarray[-1000:])*255.0 ))))
+                lvl = np.mean(np.abs(soundarray[-1000:]))
+                bright = int(np.max((0,int(lvl*255.0 ))))
                 print(bright)
                 for i in range(strip.numPixels()):
                     strip.setPixelColor(i,  Color(bright, bright, bright))
                 strip.show()
-           # if (np.max(soundarray) > 0.5):
-            #    blink(strip)
- #               myrecording = sd.rec(duration * fs, samplerate=fs, channels=1,dtype='float64')
-#
-    #    print(myrecording)
-        print("Recording Audio")
-    #sd.wait()
 
         while True:
             print('Color wipe animations.')
