@@ -120,6 +120,7 @@ if __name__ == '__main__':
         starttime = time.time()
         while True:	 
             if time.time() -starttime > buffer_intervall:
+                starttime = time.time()
                 myrecording = np.asarray(myrecording).squeeze
                 print(myrecording)
                 print(np.argmax(myrecording==0), buffer_intervall*fs)
