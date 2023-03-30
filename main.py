@@ -125,9 +125,10 @@ if __name__ == '__main__':
             myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1)
             if len(soundarray) > save_intervall*fs:
                 soundarray = soundarray[-save_intervall*fs:]
-            print(np.max(soundarray[-1000:]))
+          #  print(np.max(soundarray[-1000:]))
             if len(soundarray) > 1000:
-                lvl = np.mean(np.abs(soundarray[-1000:]))
+               # lvl = np.mean(np.abs(soundarray[-1000:]))
+                lvl = np.max(soundarray[-1000:])
                 bright = int(np.max((0,int(lvl*255.0 ))))
                 print(bright)
                 for i in range(strip.numPixels()):
