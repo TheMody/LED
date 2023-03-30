@@ -115,34 +115,21 @@ if __name__ == '__main__':
         buffer_intervall = 0.01
         save_intervall = 10
         fs=44100
-       # duration = 1  # seconds
-        import sounddevice as sd
-        duration = 5.5  # seconds
 
-        def callback(indata, outdata, frames, time, status):
-            if status:
-                print(status)
-            outdata[:] = indata
-
-        with sd.Stream(channels=1, callback=callback):
-            sd.sleep(int(duration * 1000))
-
-        myrecording = sd.rec(int(1 * fs), samplerate=fs, channels=1,dtype='float64')
+        myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1,dtype='float64')
      #   while True:
       #      print(myrecording)
         starttime = time.time()
         while True:	 
-            if time.time() -starttime > buffer_intervall:
-                starttime = time.time()
-                myrecording = np.asarray(myrecording).squeeze()
-                myrecording = myrecording[~np.isnan(myrecording)]
+            if not myrecording[-1] == 0:
+                myrecording = np.asarray(myrecording)
                 print("max",np.max(myrecording))
                 print("min",np.min(myrecording))
                 print(myrecording[:10], myrecording[-10:])
                # print(np.argmax(myrecording==0), buffer_intervall*fs)
-                tolarge = myrecording > 1.0
-                myrecording[tolarge] = 0.0
-                myrecording = myrecording[:np.argmax(myrecording==0)-1]
+               # tolarge = myrecording > 1.0
+               # myrecording[tolarge] = 0.0
+               # myrecording = myrecording[:np.argmax(myrecording==0)-1]
                 soundarray = np.append(soundarray, myrecording)
                 myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1,dtype='float64')
                 if len(soundarray) > save_intervall*fs:
