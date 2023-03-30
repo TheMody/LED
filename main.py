@@ -111,21 +111,32 @@ if __name__ == '__main__':
     if not args.clear:
         print('Use "-c" argument to clear LEDs on exit')
     try:
-	buffer_intervall = 1000
+        soundarray = []
+        buffer_intervall = 0.01
+        save_intervall = 10
         fs=44100
-        duration = 10  # seconds
-        myrecording = sd.rec(duration * fs, samplerate=fs, channels=1,dtype='float64')
-
+       # duration = 1  # seconds
+        myrecording = sd.rec(buffer_intervall * fs, samplerate=fs, channels=1,dtype='float64')
+        starttime = time.time()
         while True:	 
-
-          print(np.max(myrecording))
-          if (np.max(myrecording) > 0.5):
-             blink(strip)
-             myrecording = sd.rec(duration * fs, samplerate=fs, channels=1,dtype='float64')
-
-#    print(myrecording)
+            if starttime - time.time() > buffer_intervall:
+                soundarray = np.append(soundarray, myrecording)
+                myrecording = sd.rec(buffer_intervall * fs, samplerate=fs, channels=1,dtype='float64')
+                if len(soundarray) > save_intervall*fs:
+                    soundarray = soundarray[save_intervall*fs]
+            
+            #print(np.max(soundarray))
+            #np.max(soundarray)
+            bright = int(np.mean(soundarray[len(soundarray)-100:])*255.0)
+            for i in strip.numPixels:
+                strip.setPixelColor(i,  Color(bright, bright, bright))
+           # if (np.max(soundarray) > 0.5):
+            #    blink(strip)
+ #               myrecording = sd.rec(duration * fs, samplerate=fs, channels=1,dtype='float64')
+#
+    #    print(myrecording)
         print("Recording Audio")
-	#sd.wait()
+    #sd.wait()
 
         while True:
             print('Color wipe animations.')
@@ -142,5 +153,5 @@ if __name__ == '__main__':
             theaterChaseRainbow(strip)
 
     except KeyboardInterrupt:
-       # if args.clear:
+        # if args.clear:
             colorWipe(strip, Color(0, 0, 0), 10)
