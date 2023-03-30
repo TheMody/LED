@@ -120,6 +120,7 @@ if __name__ == '__main__':
         starttime = time.time()
         while True:	 
             if time.time() -starttime > buffer_intervall:
+                print(np.argmax(myrecording==0), buffer_intervall*fs)
                 myrecording = myrecording[:np.argmax(myrecording==0)-1]
                 soundarray = np.append(soundarray, myrecording)
                 myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1,dtype='float64')
