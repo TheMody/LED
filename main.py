@@ -117,8 +117,10 @@ if __name__ == '__main__':
         fs=44100
 
         myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1,dtype='float64')
-     #   while True:
-        print(myrecording)
+        while True:
+            print(myrecording)
+            print("max",np.max(myrecording))
+            print("min",np.min(myrecording))
        # starttime = time.time()
         while True:	 
             if not myrecording[-1] == 0:
