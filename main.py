@@ -111,7 +111,7 @@ if __name__ == '__main__':
     if not args.clear:
         print('Use "-c" argument to clear LEDs on exit')
     try:
-        soundarray = []
+        soundarray = [0]
         buffer_intervall = 0.01
         save_intervall = 10
         fs=44100
