@@ -197,7 +197,7 @@ if __name__ == '__main__':
                                 if j> 10:
                                     j = 0
                                 for i in range(strip.numPixels()):
-                                    color =  wheel( (int(i*(255/strip.numPixels())+255/ 5 * j)) & 256)
+                                    color =  wheel( (int(i*(255/strip.numPixels())+255/ 5 * j)) & 255)
                                     print(color)
                                     color = Color(int(color[0]*lvl),int(color[1]*lvl),int(color[2]*lvl))
                                     strip.setPixelColor(i, color)
