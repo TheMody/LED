@@ -102,7 +102,7 @@ def modulate_by_max(sound, intervall = 1000):
     return np.max(np.abs(sound[-intervall:]))/np.max(np.abs(sound))
 
 def modulate_by_mean(sound, intervall = 1000):
-    return np.mean(np.abs(sound[-intervall:]))
+    return np.mean(np.abs(sound[-intervall:]))/np.mean(np.abs(sound))
 
 def detect_sudden_change(sound):
     return np.mean(np.abs(sound)) *1.7  <  np.mean(np.abs(sound[-1000:]))
@@ -178,7 +178,7 @@ if __name__ == '__main__':
                         
                             plt.plot(fft_binned)
                             plt.show()
-                    lvl = modulate_by_max(soundarray)
+                    lvl = modulate_by_mean(soundarray)
                     bright = int(np.max((0,int(lvl*255.0 ))))
                     print(bright)
                     if not test:
