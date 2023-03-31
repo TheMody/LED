@@ -21,6 +21,10 @@ LED_DMA = 10          # DMA channel to use for generating signal (try 10)
 LED_BRIGHTNESS = 255  # Set to 0 for darkest and 255 for brightest
 LED_INVERT = False    # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
+test = True
+
+if test:
+    import matplotlib.pyplot as plt
 
 
 # Define functions which animate LEDs in various ways.
@@ -94,6 +98,14 @@ def theaterChaseRainbow(strip, wait_ms=50):
             for i in range(0, strip.numPixels(), 3):
                 strip.setPixelColor(i + q, 0)
 
+def modulate_by_max(sound, intervall = 1000):
+    return np.max(np.abs(sound[-intervall:]))/np.max(np.abs(sound))
+
+def modulate_by_mean(sound, intervall = 1000):
+    return np.mean(np.abs(sound[-intervall:]))
+
+def detect_sudden_change(sound):
+    return np.mean(np.abs(sound)) *1.7  <  np.mean(np.abs(sound[-1000:]))
 
 # Main program logic follows:
 if __name__ == '__main__':
@@ -105,35 +117,74 @@ if __name__ == '__main__':
     # Create NeoPixel object with appropriate configuration.
     strip = PixelStrip(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
     # Intialize the library (must be called once before other functions).
-    strip.begin()
+    if not test:
+        strip.begin()
 
     print('Press Ctrl-C to quit.')
-    if not args.clear:
-        print('Use "-c" argument to clear LEDs on exit')
     try:
         soundarray = np.asarray([0])
-        buffer_intervall = 0.01
-        save_intervall = 1
-        fs=44100
+        save_intervall = 4
+        fs=22050
+        bin_number = 400
 
-        
-        while True:	 
-            myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1)
-            sd.wait()
-            myrecording = np.asarray(myrecording)
-            soundarray = np.append(soundarray, myrecording)
-            myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1)
+        def callback(indata, frames, time, status):
+            global soundarray 
+            soundarray = np.append(soundarray, indata)
             if len(soundarray) > save_intervall*fs:
-                soundarray = soundarray[-save_intervall*fs:]
-          #  print(np.max(soundarray[-1000:]))
-            if len(soundarray) > 1000:
-               # lvl = np.mean(np.abs(soundarray[-1000:]))
-                lvl = np.max(soundarray[-1000:])
-                bright = int(np.max((0,int(lvl*255.0 ))))
-                print(bright)
-                for i in range(strip.numPixels()):
-                    strip.setPixelColor(i,  Color(bright, bright, bright))
-                strip.show()
+                soundarray = soundarray[int(-save_intervall*fs):]
+
+        with sd.InputStream(channels=1, callback=callback,  samplerate=fs):
+            while True:	 
+            #     myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1)
+            #     sd.wait()
+            #     myrecording = np.asarray(myrecording)
+            #     soundarray = np.append(soundarray, myrecording)
+            #     myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1)
+            #     if len(soundarray) > save_intervall*fs:
+            #         soundarray = soundarray[int(-save_intervall*fs):]
+            # #  print(np.max(soundarray[-1000:]))
+                if len(soundarray) > int(0.1*fs):
+                # lvl = np.mean(np.abs(soundarray[-1000:]))
+
+                    if test:
+                    # plt.plot(soundarray)
+                    # plt.show()
+                       # start = time.time()
+                        #print(soundarray.shape)
+                      #  print(detect_sudden_change(soundarray))
+                        fft = np.fft.fft(soundarray)
+                        
+
+                        #print(fft.shape)
+                        if len(fft)>=4*fs:
+                            binwidth = int(save_intervall*fs/bin_number)
+                            fft_binned = [np.mean(np.abs(fft.real[i*binwidth:(i+1)*binwidth])) for i in range(int(len(fft)/binwidth))] 
+                            fftsmall = np.abs(fft.real)[int(0.1*fs):int(0.3*fs)]
+                            fftmedium = np.abs(fft.real)[int(0.3*fs):int(1*fs)]
+                            fftbig = np.abs(fft.real)[int(1*fs):int(3*fs)]
+                            print("ffts")
+                            print((np.argmax(fftsmall)+ int(0.1*fs) ) / fs)
+                            print((np.argmax(fftmedium)+ int(0.3*fs) ) / fs)
+                            print((np.argmax(fftbig)+ int(1*fs) ) / fs)
+                            
+                            print((np.argmax(fft_binned[int(0.1*fs/bin_number):int(0.3*fs/bin_number)])*binwidth + int(0.1*fs) )/fs)
+                            print((np.argmax(fft_binned[int(0.3*fs/bin_number):int(1*fs/bin_number)])*binwidth + int(0.3*fs) )/fs)
+                            print((np.argmax(fft_binned[int(1*fs/bin_number):int(2*fs/bin_number)])*binwidth + int(1*fs) )/fs)
+                      #  ind = np.argpartition(fft, -4)[-4:]
+                       # top4 = (ind+ int(0.01*fs))/fs
+                     #   print(top4)
+                      #  print((np.argmax(fft)+ int(0.01*fs))/fs)
+                      #  print(time.time()-start)
+                        
+                            plt.plot(fft_binned)
+                            plt.show()
+                    lvl = modulate_by_max(soundarray)
+                    bright = int(np.max((0,int(lvl*255.0 ))))
+                    print(bright)
+                    if not test:
+                        for i in range(strip.numPixels()):
+                            strip.setPixelColor(i,  Color(bright, bright, bright))
+                        strip.show()
 
         while True:
             print('Color wipe animations.')
@@ -150,5 +201,4 @@ if __name__ == '__main__':
             theaterChaseRainbow(strip)
 
     except KeyboardInterrupt:
-        # if args.clear:
-            colorWipe(strip, Color(0, 0, 0), 10)
+        colorWipe(strip, Color(0, 0, 0), 10)
