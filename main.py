@@ -184,6 +184,7 @@ if __name__ == '__main__':
                         
                             plt.plot(fft_binned)
                             plt.show()
+                      #      print(wheel( (int(i*(255/strip.numPixels)+255/ 5 * j)) & 256))
                     lvl = modulate_by_max(soundarray)
                     bright = int(np.max((0,int(lvl*255.0 ))))
                     print(lvl)
@@ -196,7 +197,7 @@ if __name__ == '__main__':
                                 if j> 10:
                                     j = 0
                                 for i in range(strip.numPixels()):
-                                    color =  wheel( (int(i*(255/strip.numPixels)+255/ 5 * j)) & 256)
+                                    color =  wheel( (int(i*(255/strip.numPixels())+255/ 5 * j)) & 256)
                                     color = Color(int(color[0]*lvl),int(color[1]*lvl),int(color[2]*lvl))
                                     strip.setPixelColor(i, color)
                                 strip.show()
