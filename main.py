@@ -187,7 +187,7 @@ if __name__ == '__main__':
                       #      print(wheel( (int(i*(255/strip.numPixels)+255/ 5 * j)) & 256))
                     lvl = modulate_by_max(soundarray)
                     bright = int(np.max((0,int(lvl*255.0 ))))
-                    print(lvl)
+                #    print(lvl)
                     if not test:
                         if mode == 0:
                             if time.time()-waittime2 > 0.2:
@@ -198,7 +198,7 @@ if __name__ == '__main__':
                                     j = 0
                                 for i in range(strip.numPixels()):
                                     color =  wheel( (int(i*(255/strip.numPixels())+255/ 5 * j)) & 255)
-                                    print(color)
+                                  #  print(color)
                                     color = Color(int(color[0]*lvl),int(color[1]*lvl),int(color[2]*lvl))
                                     strip.setPixelColor(i, color)
                                 strip.show()
@@ -207,11 +207,11 @@ if __name__ == '__main__':
                                 strip.setPixelColor(i,  Color(bright, bright, bright))
                             strip.show()
                         
-                        # if detect_sudden_change(soundarray) & ((time.time()-waittime) > 0.500):
-                        #     mode = mode +1
-                        #     waittime = time.time()
-                        #     if mode >1:
-                        #         mode = 0
+                        if detect_sudden_change(soundarray) & ((time.time()-waittime) > 0.500):
+                            mode = mode +1
+                            waittime = time.time()
+                            if mode >1:
+                                mode = 0
 
         while True:
             print('Color wipe animations.')
