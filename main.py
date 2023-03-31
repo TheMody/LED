@@ -130,6 +130,7 @@ if __name__ == '__main__':
         fs=22050
         bin_number = 400
         waittime = time.time()
+        waittime2 = time.time()
 
         def callback(indata, frames, time, status):
             global soundarray 
@@ -187,7 +188,14 @@ if __name__ == '__main__':
                     print(lvl)
                     if not test:
                         if mode == 0:
-                            rainbowCycle(strip, 20, 5, lvl)
+                            if time.time()-waittime2 > 0.02:
+                                waittime2 = time.time()
+                                for j in range(256 * 5):
+                                    for i in range(strip.numPixels()):
+                                        color =  wheel( (int(i * 256 / strip.numPixels()) + j) & 255)
+                                        color = Color(int(color[0]*lvl),int(color[1]*lvl),int(color[2]*lvl))
+                                        strip.setPixelColor(i, color)
+                                    strip.show()
                         if mode == 1:
                             for i in range(strip.numPixels()):
                                 strip.setPixelColor(i,  Color(bright, bright, bright))
