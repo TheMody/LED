@@ -184,19 +184,19 @@ if __name__ == '__main__':
                         
                             plt.plot(fft_binned)
                             plt.show()
-                    lvl = modulate_by_mean(soundarray)
+                    lvl = modulate_by_max(soundarray)
                     bright = int(np.max((0,int(lvl*255.0 ))))
                     print(lvl)
                     if not test:
                         if mode == 0:
-                            if time.time()-waittime2 > 0.02:
+                            if time.time()-waittime2 > 0.2:
                                 waittime2 = time.time()
                                # for j in range(256 * 5):
                                 j = j+1
                                 if j> 5:
                                     j = 0
                                 for i in range(strip.numPixels()):
-                                    color =  wheel( (int(i * 256 / strip.numPixels()) + j) & 255)
+                                    color =  wheel( (int(255/ 5 * j)))
                                     color = Color(int(color[0]*lvl),int(color[1]*lvl),int(color[2]*lvl))
                                     strip.setPixelColor(i, color)
                                 strip.show()
