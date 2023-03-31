@@ -193,10 +193,10 @@ if __name__ == '__main__':
                                 waittime2 = time.time()
                                # for j in range(256 * 5):
                                 j = j+1
-                                if j> 5:
+                                if j> 10:
                                     j = 0
                                 for i in range(strip.numPixels()):
-                                    color =  wheel( (int(255/ 5 * j)))
+                                    color =  wheel( (int(i*(255/strip.numPixels)+255/ 5 * j)) & 256)
                                     color = Color(int(color[0]*lvl),int(color[1]*lvl),int(color[2]*lvl))
                                     strip.setPixelColor(i, color)
                                 strip.show()
