@@ -201,11 +201,11 @@ if __name__ == '__main__':
                                 strip.setPixelColor(i,  Color(bright, bright, bright))
                             strip.show()
                         
-                        if detect_sudden_change(soundarray) & (time.time()-waittime) > 0.500:
-                            mode = mode +1
-                            waittime = time.time()
-                            if mode >1:
-                                mode = 0
+                        # if detect_sudden_change(soundarray) & ((time.time()-waittime) > 0.500):
+                        #     mode = mode +1
+                        #     waittime = time.time()
+                        #     if mode >1:
+                        #         mode = 0
 
         while True:
             print('Color wipe animations.')
