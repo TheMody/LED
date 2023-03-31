@@ -102,7 +102,7 @@ def modulate_by_max(sound, intervall = 1000):
     return np.max(np.abs(sound[-intervall:]))/np.max(np.abs(sound))
 
 def modulate_by_mean(sound, intervall = 1000):
-    return np.mean(np.abs(sound[-intervall:]))/np.mean(np.abs(sound))
+    return np.mean(np.abs(sound[-intervall:]))/np.max(np.abs(sound))
 
 def detect_sudden_change(sound):
     return np.mean(np.abs(sound)) *1.7  <  np.mean(np.abs(sound[-1000:]))
