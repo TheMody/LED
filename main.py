@@ -184,7 +184,7 @@ if __name__ == '__main__':
                             plt.show()
                     lvl = modulate_by_mean(soundarray)
                     bright = int(np.max((0,int(lvl*255.0 ))))
-                   # print(bright)
+                    print(lvl)
                     if not test:
                         if mode == 0:
                             rainbowCycle(strip, 20, 5, lvl)
