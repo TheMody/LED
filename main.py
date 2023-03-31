@@ -69,11 +69,11 @@ def rainbow(strip, wait_ms=20, iterations=1):
         time.sleep(wait_ms / 1000.0)
 
 
-def rainbowCycle(strip, wait_ms=20, iterations=5):
+def rainbowCycle(strip, wait_ms=20, iterations=5, lvl = 1):
     """Draw rainbow that uniformly distributes itself across all pixels."""
     for j in range(256 * iterations):
         for i in range(strip.numPixels()):
-            strip.setPixelColor(i, wheel(
+            strip.setPixelColor(i, lvl * wheel(
                 (int(i * 256 / strip.numPixels()) + j) & 255))
         strip.show()
         time.sleep(wait_ms / 1000.0)
@@ -107,6 +107,7 @@ def modulate_by_mean(sound, intervall = 1000):
 def detect_sudden_change(sound):
     return np.mean(np.abs(sound)) *1.7  <  np.mean(np.abs(sound[-1000:]))
 
+
 # Main program logic follows:
 if __name__ == '__main__':
     # Process arguments
@@ -119,6 +120,7 @@ if __name__ == '__main__':
     # Intialize the library (must be called once before other functions).
     if not test:
         strip.begin()
+    mode = 0
 
     print('Press Ctrl-C to quit.')
     try:
@@ -126,6 +128,7 @@ if __name__ == '__main__':
         save_intervall = 4
         fs=22050
         bin_number = 400
+        waittime = time.time()
 
         def callback(indata, frames, time, status):
             global soundarray 
@@ -180,11 +183,20 @@ if __name__ == '__main__':
                             plt.show()
                     lvl = modulate_by_mean(soundarray)
                     bright = int(np.max((0,int(lvl*255.0 ))))
-                    print(bright)
+                   # print(bright)
                     if not test:
-                        for i in range(strip.numPixels()):
-                            strip.setPixelColor(i,  Color(bright, bright, bright))
-                        strip.show()
+                        if mode == 0:
+                            rainbowCycle(strip, 20, 5, lvl)
+                        if mode == 1:
+                            for i in range(strip.numPixels()):
+                                strip.setPixelColor(i,  Color(bright, bright, bright))
+                            strip.show()
+                        
+                        if detect_sudden_change(soundarray) & (time.time()-waittime) > 0.500:
+                            mode = mode +1
+                            waittime = time.time()
+                            if mode >1:
+                                mode = 0
 
         while True:
             print('Color wipe animations.')
