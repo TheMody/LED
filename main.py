@@ -255,7 +255,7 @@ if __name__ == '__main__':
                             strip.show()
                         onsets, size = AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.3, window_size=512)
                         if len(onsets) > 0 :
-                            if onsets[-1] >  (len(soundarray) - 1025) and ((time.time()-waittime) > 1025/fs):
+                            if onsets[-1] >  (len(soundarray) - 2000) and ((time.time()-waittime) > 2000/fs):
                                # print("onset", onsets, size)
                                 waittime = time.time()
                                 j = j+1
