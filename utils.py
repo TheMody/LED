@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 #from scipy.signal import find_peaks
 
 def energy(x):
@@ -113,23 +113,23 @@ def AmplitudeBasedOnsets(X,window_size=512,overlap=0.5,scale=10,
         return np.array([]), np.array([])
     
     size_of_peaks = X_energy_novelty_rectified[peaks]
-    if(displayAll):
-        plt.figure(figsize=(12,4))
-        plt.title("Picking Peaks")
-        plt.plot(peaks, X_energy_novelty_rectified[peaks], "or")
-        plt.plot(X_energy_novelty_rectified)
-        plt.show()
+    # if(displayAll):
+    #     plt.figure(figsize=(12,4))
+    #     plt.title("Picking Peaks")
+    #     plt.plot(peaks, X_energy_novelty_rectified[peaks], "or")
+    #     plt.plot(X_energy_novelty_rectified)
+    #     plt.show()
     
     # peaks are beginning of window, more accurate to make the onsets in the middle
     # of the window, reduces potential error by 1/2y
     
     onsets = peaks*skip + window_size//2
-    if(displayAll):
-        plt.figure(figsize=(12,4))
-        plt.title("Signal with Onsets")
-        plt.plot(X)
-        for k in range(len(onsets)):
-            plt.plot([onsets[k],onsets[k]],[-1,1],color='r')    
-        plt.show()
+    # if(displayAll):
+    #     plt.figure(figsize=(12,4))
+    #     plt.title("Signal with Onsets")
+    #     plt.plot(X)
+    #     for k in range(len(onsets)):
+    #         plt.plot([onsets[k],onsets[k]],[-1,1],color='r')    
+    #     plt.show()
 
     return onsets, size_of_peaks
