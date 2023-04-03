@@ -132,7 +132,7 @@ if __name__ == '__main__':
 
     print('Press Ctrl-C to quit.')
     try:
-        soundarray = np.asarray([0]*fs*save_intervall)
+        soundarray = np.asarray([0]*int(fs*save_intervall/2))
         
         bin_number = 400
         waittime = time.time()
@@ -169,7 +169,7 @@ if __name__ == '__main__':
             #         soundarray = soundarray[int(-save_intervall*fs):]
             # #  print(np.max(soundarray[-1000:]))
                 if len(soundarray) > save_intervall*fs:
-                    soundarray = soundarray[int(-save_intervall*fs):]
+                    soundarray = soundarray[-int(fs*save_intervall/2):]
                 if len(soundarray) > int(0.1*fs):
                 # lvl = np.mean(np.abs(soundarray[-1000:]))
 
