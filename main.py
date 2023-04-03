@@ -224,8 +224,8 @@ if __name__ == '__main__':
                       #      print(wheel( (int(i*(255/strip.numPixels)+255/ 5 * j)) & 256))
                   #  lvl = modulate_by_max(soundarray)# * running_avg
                    # lvl = modulate_by_mean(soundarray)
-                    lvl = running_avg_short/running_avg_long 
-                    bright = int(min(255,max(0,int(lvl*127.5 ))))
+                    lvl = running_avg_short/running_avg_long -0.5
+                    bright = int(min(255,max(0,int(lvl*255 ))))
                     print("lvl",lvl)
                     if not test:
                         if mode == 0:
