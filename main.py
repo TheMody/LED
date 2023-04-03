@@ -132,11 +132,12 @@ if __name__ == '__main__':
 
     print('Press Ctrl-C to quit.')
     try:
-        soundarray = np.asarray([0])
+        soundarray = np.asarray([0]*fs*save_intervall)
         
         bin_number = 400
         waittime = time.time()
         waittime2 = time.time()
+        waittime3 = time.time()
         j = 0
         beta1 = 0.99999
         beta2 = 0.9999
@@ -274,6 +275,10 @@ if __name__ == '__main__':
                             waittime2 = time.time()
                             if mode >0:
                                 mode = 0
+                
+                print("new data", new_data)
+                print("time since last", time.time()-waittime3)
+                waittime3 = time.time()
                 new_data = 0
 
         while True:
