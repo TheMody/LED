@@ -155,7 +155,7 @@ if __name__ == '__main__':
                 running_avg_short = running_avg_short * beta3 + i *(1-beta3)
             if len(soundarray) > save_intervall*fs:
                 soundarray = soundarray[int(-save_intervall*fs):]
-
+        print("samplerate: ", fs)
         with sd.InputStream(channels=1, callback=callback,  samplerate=fs):
             while True:	 
             #     myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1)
@@ -258,9 +258,9 @@ if __name__ == '__main__':
                         if len(onsets) > 0 :
                             if onsets[-1] >  (len(soundarray) - 2000) and ((time.time()-waittime) > 2000/fs):
                                # print("onset", onsets, size)
-                                print("TIMEsince lasts",(time.time()-waittime) )
+                             #   print("TIMEsince lasts",(time.time()-waittime) )
                                 waittime = time.time()
-                                print("onset", onsets, size)
+                              #  print("onset", onsets, size)
                                 j = j+1
                         # onsets = AmplitudeBasedOnsets(soundarray,distance=10, prominence=0.4)
                         # if len(onsets) > 0 :
