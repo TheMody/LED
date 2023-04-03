@@ -23,6 +23,8 @@ LED_BRIGHTNESS = 255  # Set to 0 for darkest and 255 for brightest
 LED_INVERT = False    # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 test = True
+save_intervall = 4
+fs=22050
 
 if test:
     import matplotlib.pyplot as plt
@@ -107,7 +109,7 @@ def modulate_by_mean(sound, intervall = 1000):
     return np.mean(np.abs(sound[-intervall:]))/np.max(np.abs(sound))
 
 def detect_sudden_change(sound):
-    return np.mean(np.abs(sound)) *1.7  <  np.mean(np.abs(sound[-1000:]))
+    return np.mean(np.abs(sound)) *1.3  <  np.mean(np.abs(sound[-fs*save_intervall/2:]))
 
 # Main program logic follows:
 if __name__ == '__main__':
@@ -126,8 +128,7 @@ if __name__ == '__main__':
     print('Press Ctrl-C to quit.')
     try:
         soundarray = np.asarray([0])
-        save_intervall = 4
-        fs=22050
+        
         bin_number = 400
         waittime = time.time()
         waittime2 = time.time()
