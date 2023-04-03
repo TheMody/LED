@@ -108,8 +108,12 @@ def modulate_by_max(sound, intervall = 1000):
 def modulate_by_mean(sound, intervall = 1000):
     return np.mean(np.abs(sound[-intervall:]))/np.max(np.abs(sound))
 
-def detect_sudden_change(sound):
-    return np.mean(np.abs(sound)) *1.3  <  np.mean(np.abs(sound[-fs*save_intervall/2:]))
+def detect_sudden_change(sound, threshold = 0.2):
+    avg_now = np.mean(np.abs(sound[int(-fs*save_intervall/2):])) 
+    avg_before = np.mean(np.abs(sound[:int(-fs*save_intervall/2)])) 
+    return avg_now  > (1 +threshold)* avg_before or avg_now  <  (1-threshold)* avg_before
+
+    
 
 # Main program logic follows:
 if __name__ == '__main__':
