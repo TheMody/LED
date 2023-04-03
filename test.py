@@ -1,6 +1,6 @@
 import numpy as np
 #import matplotlib.pyplot as plt
-from scipy.signal import find_peaks
+#from scipy.signal import find_peaks
 
 def energy(x):
     return (x @ x) / len(x)
@@ -149,7 +149,7 @@ def realFFT(X):
 def normalize(x):
     return x / np.max(x)
 # S is previous spectrum, Sn is next one
-from scipy.signal import windows
+#from scipy.signal import windows
 def spectral_distance(S,Sn,kind='SF2'):      # default will be Lerch, p.163
     if(kind == 'L1'):
         return np.sum(np.abs(Sn-S))

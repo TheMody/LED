@@ -11,7 +11,7 @@ import numpy as np
 import time
 from rpi_ws281x import PixelStrip, Color
 import argparse
-from test import SpectralBasedOnsets, AmplitudeBasedOnsets
+#from test import SpectralBasedOnsets, AmplitudeBasedOnsets
 
 # LED strip configuration:
 LED_COUNT = 16        # Number of LED pixels.
@@ -163,34 +163,34 @@ if __name__ == '__main__':
                 if len(soundarray) > int(0.1*fs):
                 # lvl = np.mean(np.abs(soundarray[-1000:]))
 
-                    if test:
+                  #  if test:
                     # plt.plot(soundarray)
                     # plt.show()
                        # start = time.time()
                         #print(soundarray.shape)
                       #  print(detect_sudden_change(soundarray))
-                        hop_length = 256
-                        # tempo, beats = librosa.beat.beat_track(y=soundarray, sr=fs, hop_length=hop_length)
-                        # print("tempo", tempo)
-                        # print("beats", beats)
-                        # plt.plot(soundarray)
-                        # plt.title("Signal with Beats")
-                        # beats = beats*hop_length
-                        # for k in range(len(beats)):
-                        # #  if(beats[k] < SR):
-                        #     plt.plot([beats[k],beats[k]],[-1,1],color='r')    
-                        # plt.show()
-                        start = time.time()
-                        onsets = AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.4, window_size=512)#, displayAll=True)
-                       # print(onsets)
-                        time_diff = time.time()-start
-                      #  print(time_diff)
-                       # print(time.time()-start)
-                      #  print(onsets)
-                        if len(onsets) > 0 :
-                            if onsets[-1] >  (len(soundarray) - 1000):
-                                print("onset", onsets)
-                            # else:
+                    #     hop_length = 256
+                    #     # tempo, beats = librosa.beat.beat_track(y=soundarray, sr=fs, hop_length=hop_length)
+                    #     # print("tempo", tempo)
+                    #     # print("beats", beats)
+                    #     # plt.plot(soundarray)
+                    #     # plt.title("Signal with Beats")
+                    #     # beats = beats*hop_length
+                    #     # for k in range(len(beats)):
+                    #     # #  if(beats[k] < SR):
+                    #     #     plt.plot([beats[k],beats[k]],[-1,1],color='r')    
+                    #     # plt.show()
+                    #     start = time.time()
+                    #     onsets = AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.4, window_size=512)#, displayAll=True)
+                    #    # print(onsets)
+                    #     time_diff = time.time()-start
+                    #   #  print(time_diff)
+                    #    # print(time.time()-start)
+                    #   #  print(onsets)
+                    #     if len(onsets) > 0 :
+                    #         if onsets[-1] >  (len(soundarray) - 1000):
+                    #             print("onset", onsets)
+                    #         # else:
                             #     print("no")
                       #  print(onsets)
 
@@ -246,10 +246,10 @@ if __name__ == '__main__':
                                 strip.setPixelColor(i,  Color(bright, bright, bright))
                             strip.show()
                         
-                        onsets = AmplitudeBasedOnsets(soundarray,distance=10, prominence=0.4)
-                        if len(onsets) > 0 :
-                            if onsets[-1] >  (len(soundarray) - 1000):
-                                print("onset", onsets)
+                        # onsets = AmplitudeBasedOnsets(soundarray,distance=10, prominence=0.4)
+                        # if len(onsets) > 0 :
+                        #     if onsets[-1] >  (len(soundarray) - 1000):
+                        #         print("onset", onsets)
                         if detect_sudden_change(soundarray) & ((time.time()-waittime) > 0.500):
                             mode = mode +1
                             waittime = time.time()
