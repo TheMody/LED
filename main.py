@@ -240,10 +240,11 @@ if __name__ == '__main__':
                             #    waittime2 = time.time()
                                # for j in range(256 * 5):
                            #     j = j+1
-                                if j> 10:
+                                rainpowpos = 20
+                                if j> rainpowpos:
                                     j = 0
                                 for i in range(strip.numPixels()):
-                                    color =  wheel( (int(i*(255/strip.numPixels())+255/ 5 * j)) & 255)
+                                    color =  wheel( (int(i*(255/strip.numPixels())+255/ rainpowpos * j)) % 255)
                                   #  print(color)
                                     color = Color(int(color[0]),int(color[1]),int(color[2]))
                                     strip.setPixelColor(i, color)
