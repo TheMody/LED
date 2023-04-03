@@ -168,7 +168,7 @@ if __name__ == '__main__':
             #     if len(soundarray) > save_intervall*fs:
             #         soundarray = soundarray[int(-save_intervall*fs):]
             # #  print(np.max(soundarray[-1000:]))
-                if len(soundarray) > save_intervall*fs:
+                if len(soundarray) > save_intervall*fs/2:
                     soundarray = soundarray[-int(fs*save_intervall/2):]
                 if len(soundarray) > int(0.1*fs):
                 # lvl = np.mean(np.abs(soundarray[-1000:]))
