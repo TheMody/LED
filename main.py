@@ -144,17 +144,18 @@ if __name__ == '__main__':
         running_avg_long = 0.01
         running_avg_medium = 0.01
         running_avg_short = 0.01
+        new_data = 0
 
         def callback(indata, frames, time, status):
-            global soundarray#, running_avg_long, running_avg_short, running_avg_medium
+            global soundarray, new_data#, running_avg_long, running_avg_short, running_avg_medium
             soundarray = np.append(soundarray, indata)
+            new_data = new_data + len(indata)
             # for i in indata:
             #     i = abs(i)
             #     running_avg_long = running_avg_long * beta1 + i *(1-beta1)
             #     running_avg_medium = running_avg_medium * beta2 + i *(1-beta2)
             #     running_avg_short = running_avg_short * beta3 + i *(1-beta3)
-            if len(soundarray) > save_intervall*fs:
-                soundarray = soundarray[int(-save_intervall*fs):]
+
         print("samplerate: ", fs)
         with sd.InputStream(channels=1, callback=callback,  samplerate=fs):
             while True:	 
@@ -166,6 +167,8 @@ if __name__ == '__main__':
             #     if len(soundarray) > save_intervall*fs:
             #         soundarray = soundarray[int(-save_intervall*fs):]
             # #  print(np.max(soundarray[-1000:]))
+                if len(soundarray) > save_intervall*fs:
+                    soundarray = soundarray[int(-save_intervall*fs):]
                 if len(soundarray) > int(0.1*fs):
                 # lvl = np.mean(np.abs(soundarray[-1000:]))
 
@@ -256,7 +259,7 @@ if __name__ == '__main__':
                         onsets, size = AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.3, window_size=512)
                         print(len(soundarray))
                         if len(onsets) > 0 :
-                            if onsets[-1] >  (len(soundarray) - 2000) and ((time.time()-waittime) > 2000/fs):
+                            if onsets[-1] >  (len(soundarray) - new_data) and ((time.time()-waittime) > 2000/fs):
                                # print("onset", onsets, size)
                              #   print("TIMEsince lasts",(time.time()-waittime) )
                                 waittime = time.time()
@@ -271,6 +274,7 @@ if __name__ == '__main__':
                             waittime2 = time.time()
                             if mode >0:
                                 mode = 0
+                new_data = 0
 
         while True:
             print('Color wipe animations.')
