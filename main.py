@@ -12,6 +12,7 @@ import time
 from rpi_ws281x import PixelStrip, Color
 import argparse
 #from test import SpectralBasedOnsets, AmplitudeBasedOnsets
+from utils import AmplitudeBasedOnsets
 
 # LED strip configuration:
 LED_COUNT = 16        # Number of LED pixels.
@@ -168,7 +169,7 @@ if __name__ == '__main__':
                 if len(soundarray) > int(0.1*fs):
                 # lvl = np.mean(np.abs(soundarray[-1000:]))
 
-                  #  if test:
+                    if test:
                     # plt.plot(soundarray)
                     # plt.show()
                        # start = time.time()
@@ -185,16 +186,17 @@ if __name__ == '__main__':
                     #     # #  if(beats[k] < SR):
                     #     #     plt.plot([beats[k],beats[k]],[-1,1],color='r')    
                     #     # plt.show()
-                    #     start = time.time()
-                    #     onsets = AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.4, window_size=512)#, displayAll=True)
-                    #    # print(onsets)
-                    #     time_diff = time.time()-start
-                    #   #  print(time_diff)
-                    #    # print(time.time()-start)
-                    #   #  print(onsets)
-                    #     if len(onsets) > 0 :
-                    #         if onsets[-1] >  (len(soundarray) - 1000):
-                    #             print("onset", onsets)
+                        start = time.time()
+                        onsets, size = AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.4, window_size=512)#, displayAll=True)
+                       # print("onsets", onsets, size)
+                       # print(onsets)
+                        # time_diff = time.time()-start
+                        # print(time_diff)
+                        #print(time.time()-start)
+                      #  print(onsets)
+                        if len(onsets) > 0 :
+                            if onsets[-1] >  (len(soundarray) - 1025):# and size[-1]  >= 0.99:
+                                print("onset", onsets, size)
                     #         # else:
                             #     print("no")
                       #  print(onsets)
@@ -231,13 +233,13 @@ if __name__ == '__main__':
                    # lvl = modulate_by_mean(soundarray)
                     lvl = running_avg_short/running_avg_long -0.5
                     bright = int(min(255,max(0,int(lvl*255 ))))
-                    print("lvl",lvl)
+                  #  print("lvl",lvl)
                     if not test:
                         if mode == 0:
-                            if time.time()-waittime2 > 0.2:
-                                waittime2 = time.time()
+                          #  if time.time()-waittime2 > 0.2:
+                            #    waittime2 = time.time()
                                # for j in range(256 * 5):
-                                j = j+1
+                           #     j = j+1
                                 if j> 10:
                                     j = 0
                                 for i in range(strip.numPixels()):
@@ -250,16 +252,21 @@ if __name__ == '__main__':
                             for i in range(strip.numPixels()):
                                 strip.setPixelColor(i,  Color(bright, bright, bright))
                             strip.show()
-                        
+                        onsets, size = AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.4, window_size=512)
+                        if len(onsets) > 0 :
+                            if onsets[-1] >  (len(soundarray) - 1025) and ((time.time()-waittime) > 0.500):
+                                print("onset", onsets, size)
+                                waittime = time.time()
+                                j = j+1
                         # onsets = AmplitudeBasedOnsets(soundarray,distance=10, prominence=0.4)
                         # if len(onsets) > 0 :
                         #     if onsets[-1] >  (len(soundarray) - 1000):
                         #         print("onset", onsets)
-                        if detect_sudden_change(soundarray) & ((time.time()-waittime) > 0.500):
-                            mode = mode +1
-                            waittime = time.time()
-                            if mode >1:
-                                mode = 0
+                        # if detect_sudden_change(soundarray) & ((time.time()-waittime) > 0.500):
+                        #     mode = mode +1
+                        #     waittime = time.time()
+                        #     if mode >1:
+                        #         mode = 0
 
         while True:
             print('Color wipe animations.')

@@ -1,5 +1,5 @@
 import numpy as np
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 #from scipy.signal import find_peaks
 
 def energy(x):
@@ -14,7 +14,23 @@ def rectify(x):
         return list(np.maximum(x,np.zeros(len(x))))
     else:
         return max(x,0)
-
+def find_peaks(x,prominence = 0.0,distance = 0):
+    peaks = []
+    def smooth(x):
+        return np.convolve(x, np.ones(5)/5, mode='same')
+    x_smooth = smooth(x)
+    x = x-x_smooth
+    x = x/max(x)
+    x[x<0] = 0
+    for i in range(1,len(x)-1):
+        if(x[i] > (1+prominence) * x[i-1] and x[i] > (1+prominence) *  x[i+1]):
+            if len(peaks) == 0:
+                peaks.append(i)
+            else:
+                if i-peaks[-1] > distance:
+                    peaks.append(i)
+    peaks = np.array(peaks)
+    return peaks
 
 
 def AmplitudeBasedOnsets(X,window_size=512,overlap=0.5,scale=10,
@@ -80,30 +96,30 @@ def AmplitudeBasedOnsets(X,window_size=512,overlap=0.5,scale=10,
 
     # peak picking
 
-    peaks,_ = find_peaks(X_energy_novelty_rectified,
+    peaks = find_peaks(X_energy_novelty_rectified,
                          height=height,prominence=prominence,distance=distance)  
     
     if(len(peaks)==0):
     #    print("No peaks found!")
         return np.array([])
-    # if(displayAll):
-    #     plt.figure(figsize=(12,4))
-    #     plt.title("Picking Peaks")
-    #     plt.plot(peaks, X_energy_novelty_rectified[peaks], "or")
-    #     plt.plot(X_energy_novelty_rectified)
-    #     plt.show()
+    if(displayAll):
+        plt.figure(figsize=(12,4))
+        plt.title("Picking Peaks")
+        plt.plot(peaks, X_energy_novelty_rectified[peaks], "or")
+        plt.plot(X_energy_novelty_rectified)
+        plt.show()
     
     # peaks are beginning of window, more accurate to make the onsets in the middle
     # of the window, reduces potential error by 1/2y
     
     onsets = peaks*skip + window_size//2
-    # if(displayAll):
-    #     plt.figure(figsize=(12,4))
-    #     plt.title("Signal with Onsets")
-    #     plt.plot(X)
-    #     for k in range(len(onsets)):
-    #         plt.plot([onsets[k],onsets[k]],[-1,1],color='r')    
-    #     plt.show()
+    if(displayAll):
+        plt.figure(figsize=(12,4))
+        plt.title("Signal with Onsets")
+        plt.plot(X)
+        for k in range(len(onsets)):
+            plt.plot([onsets[k],onsets[k]],[-1,1],color='r')    
+        plt.show()
 
     return onsets
 
