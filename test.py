@@ -21,7 +21,7 @@ def AmplitudeBasedOnsets(X,window_size=512,overlap=0.5,scale=10,
                          height=None,
                          prominence=None,
                          distance=None,
-                         displayAll=True):
+                         displayAll=False):
     
     N = len(X)
     
@@ -29,15 +29,15 @@ def AmplitudeBasedOnsets(X,window_size=512,overlap=0.5,scale=10,
 
     skip = int((1-overlap)*window_size)
     
-    print("skip:",skip)
+   # print("skip:",skip)
 
     num_windows = (N // skip) - 1
 
-    print("num_windows:",num_windows)
+  #  print("num_windows:",num_windows)
 
     window_locations = skip * np.arange(num_windows)
 
-    print("window_locations:",window_locations)
+  #  print("window_locations:",window_locations)
 
     X_energy = np.array( [ energy( X[ w : (w+window_size)] ) for w in window_locations ])
 
@@ -48,11 +48,11 @@ def AmplitudeBasedOnsets(X,window_size=512,overlap=0.5,scale=10,
     else:
         X_energy_log = np.log(1 + scale*X_energy)
 
-    if(displayAll):
-        plt.figure(figsize=(12,4))
-        plt.title("Log X Energy Signal with scale factor "+str(scale))
-        plt.plot(X_energy_log)
-        plt.show()
+    # if(displayAll):
+    #     plt.figure(figsize=(12,4))
+    #     plt.title("Log X Energy Signal with scale factor "+str(scale))
+    #     plt.plot(X_energy_log)
+    #     plt.show()
 
     X_energy_log = np.concatenate([[0],X_energy_log])    
 
@@ -64,19 +64,19 @@ def AmplitudeBasedOnsets(X,window_size=512,overlap=0.5,scale=10,
     
     X_energy_novelty = X_energy_novelty / max(X_energy_novelty)
     
-    if(displayAll):
-        plt.figure(figsize=(12,4))
-        plt.title("X Energy Novelty")
-        plt.plot(X_energy_novelty)
-        plt.show()
+    # if(displayAll):
+    #     plt.figure(figsize=(12,4))
+    #     plt.title("X Energy Novelty")
+    #     plt.plot(X_energy_novelty)
+    #     plt.show()
 
     X_energy_novelty_rectified = rectify(X_energy_novelty)      
     
-    if(displayAll):
-        plt.figure(figsize=(12,4))
-        plt.title("Rectified X Energy Novelty")
-        plt.plot(X_energy_novelty_rectified)
-        plt.show()
+    # if(displayAll):
+    #     plt.figure(figsize=(12,4))
+    #     plt.title("Rectified X Energy Novelty")
+    #     plt.plot(X_energy_novelty_rectified)
+    #     plt.show()
 
     # peak picking
 
@@ -84,26 +84,28 @@ def AmplitudeBasedOnsets(X,window_size=512,overlap=0.5,scale=10,
                          height=height,prominence=prominence,distance=distance)  
     
     if(len(peaks)==0):
-        print("No peaks found!")
-        return (np.array([]), np.zeros(len(X)))
-    
-    plt.figure(figsize=(12,4))
-    plt.title("Picking Peaks")
-    plt.plot(peaks, X_energy_novelty_rectified[peaks], "or")
-    plt.plot(X_energy_novelty_rectified)
-    plt.show()
+    #    print("No peaks found!")
+        return np.array([])
+    # if(displayAll):
+    #     plt.figure(figsize=(12,4))
+    #     plt.title("Picking Peaks")
+    #     plt.plot(peaks, X_energy_novelty_rectified[peaks], "or")
+    #     plt.plot(X_energy_novelty_rectified)
+    #     plt.show()
     
     # peaks are beginning of window, more accurate to make the onsets in the middle
     # of the window, reduces potential error by 1/2y
     
     onsets = peaks*skip + window_size//2
+    if(displayAll):
+        plt.figure(figsize=(12,4))
+        plt.title("Signal with Onsets")
+        plt.plot(X)
+        for k in range(len(onsets)):
+            plt.plot([onsets[k],onsets[k]],[-1,1],color='r')    
+        plt.show()
 
-    plt.figure(figsize=(12,4))
-    plt.title("Signal with Onsets")
-    plt.plot(X)
-    for k in range(len(onsets)):
-        plt.plot([onsets[k],onsets[k]],[-1,1],color='r')    
-    plt.show()
+    return onsets
 
 
 
@@ -180,7 +182,7 @@ def SpectralBasedOnsets(X,window_size=512,overlap=0.5,
                         height=None,     # these 3 parameters are for pick_peak,
                         prominence=0.1, #    any not equal to None will be applied
                         distance=None,
-                        displayAll=True):
+                        displayAll=False):
     
     N = len(X)
     
@@ -257,47 +259,41 @@ def SpectralBasedOnsets(X,window_size=512,overlap=0.5,
 
     if(len(peaks)==0):
         print("No peaks found!")
-        return (np.array([]), np.zeros(len(X)))
-    
-    plt.figure(figsize=(12,4))
-    plt.title("Picking Peaks")
-    plt.plot(peaks, X_spectral_novelty[peaks], "or")
-    plt.plot(X_spectral_novelty)
-    plt.show()
+        return np.array([])
+    if(displayAll):
+        plt.figure(figsize=(12,4))
+        plt.title("Picking Peaks")
+        plt.plot(peaks, X_spectral_novelty[peaks], "or")
+        plt.plot(X_spectral_novelty)
+        plt.show()
 
-    fft_novelty = realFFT(X_spectral_novelty)
-    plt.title("fft_novelty")
-    plt.plot(X_spectral_novelty)
-    plt.plot(fft_novelty)
-    plt.show()
+    # fft_novelty = realFFT(X_spectral_novelty)
+    # plt.title("fft_novelty")
+    # plt.plot(X_spectral_novelty)
+    # plt.plot(fft_novelty)
+    # plt.show()
 
     # peaks are beginning of window, more accurate to make the onsets in the middle
     # of the window, reduces potential error by 1/2
     
     onsets = peaks*skip + window_size//2
-
-    plt.figure(figsize=(12,4))
-    plt.title("Signal with Onsets")
-    plt.plot(X)
-    for k in range(len(onsets)):
-        plt.plot([onsets[k],onsets[k]],[-1,1],color='r')    
+    if(displayAll):
+        plt.figure(figsize=(12,4))
+        plt.title("Signal with Onsets")
+        plt.plot(X)
+        for k in range(len(onsets)):
+            plt.plot([onsets[k],onsets[k]],[-1,1],color='r')    
+        plt.show()
+    return onsets
+if __name__ == '__main__':
+    x = np.asarray([np.sin(i/10) for i in range(22000)])
+    y = np.asarray([np.sin(i/1000) for i in range(22000)])
+    c = np.asarray([np.sin(0.5+i/100000) for i in range(22000)])
+    c2= np.asarray([ ((3000-int(i%3000) ) / 3000)   for i in range(22000)])
+    x = x*y*c*c2
+    plt.plot(x)
     plt.show()
 
-
-x = np.asarray([np.sin(i/10) for i in range(22000)])
-y = np.asarray([np.sin(i/1000) for i in range(22000)])
-c = np.asarray([np.sin(0.5+i/100000) for i in range(22000)])
-c2= np.asarray([ ((3000-int(i%3000) ) / 3000)   for i in range(22000)])
-x = x*y*c*c2
-plt.plot(x)
-plt.show()
-
-import librosa
-hop_length = int((1-0.5)*512)
-SR = 22000
-tempo, beats = librosa.beat.beat_track(y=x, sr=SR, hop_length=hop_length)
-print("tempo",tempo)
-print("beats",beats)
-#AmplitudeBasedOnsets(x)
-SpectralBasedOnsets(x)
+    #AmplitudeBasedOnsets(x)
+    SpectralBasedOnsets(x)
 

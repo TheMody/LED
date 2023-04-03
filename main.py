@@ -11,6 +11,7 @@ import numpy as np
 import time
 from rpi_ws281x import PixelStrip, Color
 import argparse
+from test import SpectralBasedOnsets, AmplitudeBasedOnsets
 
 # LED strip configuration:
 LED_COUNT = 16        # Number of LED pixels.
@@ -108,7 +109,6 @@ def modulate_by_mean(sound, intervall = 1000):
 def detect_sudden_change(sound):
     return np.mean(np.abs(sound)) *1.7  <  np.mean(np.abs(sound[-1000:]))
 
-
 # Main program logic follows:
 if __name__ == '__main__':
     # Process arguments
@@ -132,10 +132,21 @@ if __name__ == '__main__':
         waittime = time.time()
         waittime2 = time.time()
         j = 0
+        beta1 = 0.99999
+        beta2 = 0.9999
+        beta3 = 0.999
+        running_avg_long = 0.0
+        running_avg_medium = 0.0
+        running_avg_short = 0.0
 
         def callback(indata, frames, time, status):
-            global soundarray 
+            global soundarray, running_avg_long, running_avg_short, running_avg_medium
             soundarray = np.append(soundarray, indata)
+            for i in indata:
+                i = abs(i)
+                running_avg_long = running_avg_long * beta1 + i *(1-beta1)
+                running_avg_medium = running_avg_medium * beta2 + i *(1-beta2)
+                running_avg_short = running_avg_short * beta3 + i *(1-beta3)
             if len(soundarray) > save_intervall*fs:
                 soundarray = soundarray[int(-save_intervall*fs):]
 
@@ -158,36 +169,64 @@ if __name__ == '__main__':
                        # start = time.time()
                         #print(soundarray.shape)
                       #  print(detect_sudden_change(soundarray))
-                        fft = np.fft.fft(soundarray)
+                        hop_length = 256
+                        # tempo, beats = librosa.beat.beat_track(y=soundarray, sr=fs, hop_length=hop_length)
+                        # print("tempo", tempo)
+                        # print("beats", beats)
+                        # plt.plot(soundarray)
+                        # plt.title("Signal with Beats")
+                        # beats = beats*hop_length
+                        # for k in range(len(beats)):
+                        # #  if(beats[k] < SR):
+                        #     plt.plot([beats[k],beats[k]],[-1,1],color='r')    
+                        # plt.show()
+                        start = time.time()
+                        onsets = AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.4, window_size=512)#, displayAll=True)
+                       # print(onsets)
+                        time_diff = time.time()-start
+                      #  print(time_diff)
+                       # print(time.time()-start)
+                      #  print(onsets)
+                        if len(onsets) > 0 :
+                            if onsets[-1] >  (len(soundarray) - 1000):
+                                print("onset", onsets)
+                            # else:
+                            #     print("no")
+                      #  print(onsets)
+
+                      #  AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.1)
+                        # fft = np.fft.fft(soundarray)
                         
 
-                        #print(fft.shape)
-                        if len(fft)>=4*fs:
-                            binwidth = int(save_intervall*fs/bin_number)
-                            fft_binned = [np.mean(np.abs(fft.real[i*binwidth:(i+1)*binwidth])) for i in range(int(len(fft)/binwidth))] 
-                            fftsmall = np.abs(fft.real)[int(0.1*fs):int(0.3*fs)]
-                            fftmedium = np.abs(fft.real)[int(0.3*fs):int(1*fs)]
-                            fftbig = np.abs(fft.real)[int(1*fs):int(3*fs)]
-                            print("ffts")
-                            print((np.argmax(fftsmall)+ int(0.1*fs) ) / fs)
-                            print((np.argmax(fftmedium)+ int(0.3*fs) ) / fs)
-                            print((np.argmax(fftbig)+ int(1*fs) ) / fs)
+                        # #print(fft.shape)
+                        # if len(fft)>=4*fs:
+                        #     binwidth = int(save_intervall*fs/bin_number)
+                        #     fft_binned = [np.mean(np.abs(fft.real[i*binwidth:(i+1)*binwidth])) for i in range(int(len(fft)/binwidth))] 
+                        #     fftsmall = np.abs(fft.real)[int(0.1*fs):int(0.3*fs)]
+                        #     fftmedium = np.abs(fft.real)[int(0.3*fs):int(1*fs)]
+                        #     fftbig = np.abs(fft.real)[int(1*fs):int(3*fs)]
+                        #     print("ffts")
+                        #     print((np.argmax(fftsmall)+ int(0.1*fs) ) / fs)
+                        #     print((np.argmax(fftmedium)+ int(0.3*fs) ) / fs)
+                        #     print((np.argmax(fftbig)+ int(1*fs) ) / fs)
                             
-                            print((np.argmax(fft_binned[int(0.1*fs/bin_number):int(0.3*fs/bin_number)])*binwidth + int(0.1*fs) )/fs)
-                            print((np.argmax(fft_binned[int(0.3*fs/bin_number):int(1*fs/bin_number)])*binwidth + int(0.3*fs) )/fs)
-                            print((np.argmax(fft_binned[int(1*fs/bin_number):int(2*fs/bin_number)])*binwidth + int(1*fs) )/fs)
+                        #     print((np.argmax(fft_binned[int(0.1*fs/bin_number):int(0.3*fs/bin_number)])*binwidth + int(0.1*fs) )/fs)
+                        #     print((np.argmax(fft_binned[int(0.3*fs/bin_number):int(1*fs/bin_number)])*binwidth + int(0.3*fs) )/fs)
+                        #     print((np.argmax(fft_binned[int(1*fs/bin_number):int(2*fs/bin_number)])*binwidth + int(1*fs) )/fs)
                       #  ind = np.argpartition(fft, -4)[-4:]
                        # top4 = (ind+ int(0.01*fs))/fs
                      #   print(top4)
                       #  print((np.argmax(fft)+ int(0.01*fs))/fs)
                       #  print(time.time()-start)
                         
-                            plt.plot(fft_binned)
-                            plt.show()
+                            # plt.plot(fft_binned)
+                            # plt.show()
                       #      print(wheel( (int(i*(255/strip.numPixels)+255/ 5 * j)) & 256))
-                    lvl = modulate_by_max(soundarray)
-                    bright = int(np.max((0,int(lvl*255.0 ))))
-                #    print(lvl)
+                  #  lvl = modulate_by_max(soundarray)# * running_avg
+                   # lvl = modulate_by_mean(soundarray)
+                    lvl = running_avg_short/running_avg_long 
+                    bright = int(min(255,max(0,int(lvl*127.5 ))))
+                    print("lvl",lvl)
                     if not test:
                         if mode == 0:
                             if time.time()-waittime2 > 0.2:
@@ -207,6 +246,10 @@ if __name__ == '__main__':
                                 strip.setPixelColor(i,  Color(bright, bright, bright))
                             strip.show()
                         
+                        onsets = AmplitudeBasedOnsets(soundarray,distance=10, prominence=0.4)
+                        if len(onsets) > 0 :
+                            if onsets[-1] >  (len(soundarray) - 1000):
+                                print("onset", onsets)
                         if detect_sudden_change(soundarray) & ((time.time()-waittime) > 0.500):
                             mode = mode +1
                             waittime = time.time()
