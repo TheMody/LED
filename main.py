@@ -258,6 +258,7 @@ if __name__ == '__main__':
                             if onsets[-1] >  (len(soundarray) - 2000) and ((time.time()-waittime) > 2000/fs):
                                # print("onset", onsets, size)
                                 waittime = time.time()
+                                print("onset", onsets, size)
                                 j = j+1
                         # onsets = AmplitudeBasedOnsets(soundarray,distance=10, prominence=0.4)
                         # if len(onsets) > 0 :
