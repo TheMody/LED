@@ -257,15 +257,15 @@ if __name__ == '__main__':
                             for i in range(strip.numPixels()):
                                 strip.setPixelColor(i,  Color(bright, bright, bright))
                             strip.show()
-                        onsets, size = AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.3, window_size=512)
-                        print(len(soundarray))
-                        if len(onsets) > 0 :
-                            if onsets[-1] >  (len(soundarray) - new_data) and ((time.time()-waittime) > 2000/fs):
-                               # print("onset", onsets, size)
-                             #   print("TIMEsince lasts",(time.time()-waittime) )
-                                waittime = time.time()
-                              #  print("onset", onsets, size)
-                                j = j+1
+                        # onsets, size = AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.3, window_size=512)
+                        # print(len(soundarray))
+                        # if len(onsets) > 0 :
+                        #     if onsets[-1] >  (len(soundarray) - new_data) and ((time.time()-waittime) > 2000/fs):
+                        #        # print("onset", onsets, size)
+                        #      #   print("TIMEsince lasts",(time.time()-waittime) )
+                        #         waittime = time.time()
+                        #       #  print("onset", onsets, size)
+                        #         j = j+1
                         # onsets = AmplitudeBasedOnsets(soundarray,distance=10, prominence=0.4)
                         # if len(onsets) > 0 :
                         #     if onsets[-1] >  (len(soundarray) - 1000):
