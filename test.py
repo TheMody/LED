@@ -175,10 +175,10 @@ def SpectralBasedOnsets(X,window_size=512,overlap=0.5,
                         kind = None,     # distance function used, L1, L2, CD, SF1, SF2
                         filtr = None,    # filter applied before peak picking, if any
                         size = 3,        # size of kernel used in filter
-                        win = None,      # apply windowing function to window
-                        scale=None,      # scale factor for log, None = no log
+                        win = "tri",      # apply windowing function to window
+                        scale=10,      # scale factor for log, None = no log
                         height=None,     # these 3 parameters are for pick_peak,
-                        prominence=None, #    any not equal to None will be applied
+                        prominence=0.1, #    any not equal to None will be applied
                         distance=None,
                         displayAll=True):
     
@@ -217,7 +217,7 @@ def SpectralBasedOnsets(X,window_size=512,overlap=0.5,
       #  print(X_spectrogram_log[k])
         X_spectral_novelty[k] = spectral_distance(X_spectrogram_log[k-1],X_spectrogram_log[k])
     
-    print(X_spectral_novelty)
+   # print(X_spectral_novelty)
     
     # normalize spectral novelty function
     if(displayAll):
@@ -265,6 +265,12 @@ def SpectralBasedOnsets(X,window_size=512,overlap=0.5,
     plt.plot(X_spectral_novelty)
     plt.show()
 
+    fft_novelty = realFFT(X_spectral_novelty)
+    plt.title("fft_novelty")
+    plt.plot(X_spectral_novelty)
+    plt.plot(fft_novelty)
+    plt.show()
+
     # peaks are beginning of window, more accurate to make the onsets in the middle
     # of the window, reduces potential error by 1/2
     
@@ -286,6 +292,12 @@ x = x*y*c*c2
 plt.plot(x)
 plt.show()
 
+import librosa
+hop_length = int((1-0.5)*512)
+SR = 22000
+tempo, beats = librosa.beat.beat_track(y=x, sr=SR, hop_length=hop_length)
+print("tempo",tempo)
+print("beats",beats)
 #AmplitudeBasedOnsets(x)
 SpectralBasedOnsets(x)
 
