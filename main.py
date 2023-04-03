@@ -25,7 +25,7 @@ LED_INVERT = False    # True to invert the signal (when using NPN transistor lev
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 test = True
 save_intervall = 4
-fs=22050
+fs=44100
 
 if test:
     import matplotlib.pyplot as plt
@@ -149,8 +149,8 @@ if __name__ == '__main__':
 
         def callback(indata, frames, time, status):
             global soundarray, new_data#, running_avg_long, running_avg_short, running_avg_medium
-            soundarray = np.append(soundarray, indata)
-            new_data = new_data + len(indata)
+            soundarray = np.append(soundarray, indata[np.arange(0, len(indata), 2)])
+            new_data = new_data + int(len(indata)/2)
             # for i in indata:
             #     i = abs(i)
             #     running_avg_long = running_avg_long * beta1 + i *(1-beta1)
@@ -257,21 +257,17 @@ if __name__ == '__main__':
                             for i in range(strip.numPixels()):
                                 strip.setPixelColor(i,  Color(bright, bright, bright))
                             strip.show()
-                        # start = time.time()
-                        # onsets, size = AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.3, window_size=512)
-                        # print(time.time()-start)
-                        # print(len(soundarray))
-                        # if len(onsets) > 0 :
-                        #     if onsets[-1] >  (len(soundarray) - new_data) and ((time.time()-waittime) > 2000/fs):
-                        #        # print("onset", onsets, size)
-                        #      #   print("TIMEsince lasts",(time.time()-waittime) )
-                        #         waittime = time.time()
-                        #       #  print("onset", onsets, size)
-                        #         j = j+1
-                        # onsets = AmplitudeBasedOnsets(soundarray,distance=10, prominence=0.4)
-                        # if len(onsets) > 0 :
-                        #     if onsets[-1] >  (len(soundarray) - 1000):
-                        #         print("onset", onsets)
+                        start = time.time()
+                        onsets, size = AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.3, window_size=512)
+                        print(time.time()-start)
+                        print(len(soundarray))
+                        if len(onsets) > 0 :
+                            if onsets[-1] >  (len(soundarray) - new_data) and ((time.time()-waittime) > 2000/fs):
+                               # print("onset", onsets, size)
+                             #   print("TIMEsince lasts",(time.time()-waittime) )
+                                waittime = time.time()
+                              #  print("onset", onsets, size)
+                                j = j+1
                         if detect_sudden_change(soundarray) & ((time.time()-waittime2) > 0.500):
                             mode = mode +1
                             waittime2 = time.time()
