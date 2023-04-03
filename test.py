@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 
 def energy(x):
@@ -97,13 +97,13 @@ def AmplitudeBasedOnsets(X,window_size=512,overlap=0.5,scale=10,
     # of the window, reduces potential error by 1/2y
     
     onsets = peaks*skip + window_size//2
-    if(displayAll):
-        plt.figure(figsize=(12,4))
-        plt.title("Signal with Onsets")
-        plt.plot(X)
-        for k in range(len(onsets)):
-            plt.plot([onsets[k],onsets[k]],[-1,1],color='r')    
-        plt.show()
+    # if(displayAll):
+    #     plt.figure(figsize=(12,4))
+    #     plt.title("Signal with Onsets")
+    #     plt.plot(X)
+    #     for k in range(len(onsets)):
+    #         plt.plot([onsets[k],onsets[k]],[-1,1],color='r')    
+    #     plt.show()
 
     return onsets
 
@@ -222,18 +222,18 @@ def SpectralBasedOnsets(X,window_size=512,overlap=0.5,
    # print(X_spectral_novelty)
     
     # normalize spectral novelty function
-    if(displayAll):
-        plt.figure(figsize=(12,4))
-        plt.title("X Spectral Novelty unnomarlized")
-        plt.plot(X_spectral_novelty)
-        plt.show()
+    # if(displayAll):
+    #     plt.figure(figsize=(12,4))
+    #     plt.title("X Spectral Novelty unnomarlized")
+    #     plt.plot(X_spectral_novelty)
+    #     plt.show()
     X_spectral_novelty = normalize(X_spectral_novelty)
     
-    if(displayAll):
-        plt.figure(figsize=(12,4))
-        plt.title("X Spectral Novelty")
-        plt.plot(X_spectral_novelty)
-        plt.show()
+    # if(displayAll):
+    #     plt.figure(figsize=(12,4))
+    #     plt.title("X Spectral Novelty")
+    #     plt.plot(X_spectral_novelty)
+    #     plt.show()
 
 
 #     Distance functions are always >= 0
@@ -245,13 +245,13 @@ def SpectralBasedOnsets(X,window_size=512,overlap=0.5,
 #         plt.plot(X_spectral_novelty_rectified)
 #         plt.show()
         
-    if(filtr != None):
-        X_spectral_novelty = filtr(X_spectral_novelty,size)
-        if(displayAll):
-            plt.figure(figsize=(12,4))
-            plt.title("Filtered X Spectral Novelty")
-            plt.plot(X_spectral_novelty)
-            plt.show()
+    # if(filtr != None):
+    #     X_spectral_novelty = filtr(X_spectral_novelty,size)
+    #     if(displayAll):
+    #         plt.figure(figsize=(12,4))
+    #         plt.title("Filtered X Spectral Novelty")
+    #         plt.plot(X_spectral_novelty)
+    #         plt.show()
             
     # peak picking
 
@@ -260,12 +260,12 @@ def SpectralBasedOnsets(X,window_size=512,overlap=0.5,
     if(len(peaks)==0):
         print("No peaks found!")
         return np.array([])
-    if(displayAll):
-        plt.figure(figsize=(12,4))
-        plt.title("Picking Peaks")
-        plt.plot(peaks, X_spectral_novelty[peaks], "or")
-        plt.plot(X_spectral_novelty)
-        plt.show()
+    # if(displayAll):
+    #     plt.figure(figsize=(12,4))
+    #     plt.title("Picking Peaks")
+    #     plt.plot(peaks, X_spectral_novelty[peaks], "or")
+    #     plt.plot(X_spectral_novelty)
+    #     plt.show()
 
     # fft_novelty = realFFT(X_spectral_novelty)
     # plt.title("fft_novelty")
@@ -277,13 +277,13 @@ def SpectralBasedOnsets(X,window_size=512,overlap=0.5,
     # of the window, reduces potential error by 1/2
     
     onsets = peaks*skip + window_size//2
-    if(displayAll):
-        plt.figure(figsize=(12,4))
-        plt.title("Signal with Onsets")
-        plt.plot(X)
-        for k in range(len(onsets)):
-            plt.plot([onsets[k],onsets[k]],[-1,1],color='r')    
-        plt.show()
+    # if(displayAll):
+    #     plt.figure(figsize=(12,4))
+    #     plt.title("Signal with Onsets")
+    #     plt.plot(X)
+    #     for k in range(len(onsets)):
+    #         plt.plot([onsets[k],onsets[k]],[-1,1],color='r')    
+    #     plt.show()
     return onsets
 if __name__ == '__main__':
     x = np.asarray([np.sin(i/10) for i in range(22000)])
@@ -291,8 +291,8 @@ if __name__ == '__main__':
     c = np.asarray([np.sin(0.5+i/100000) for i in range(22000)])
     c2= np.asarray([ ((3000-int(i%3000) ) / 3000)   for i in range(22000)])
     x = x*y*c*c2
-    plt.plot(x)
-    plt.show()
+    # plt.plot(x)
+    # plt.show()
 
     #AmplitudeBasedOnsets(x)
     SpectralBasedOnsets(x)
