@@ -141,18 +141,18 @@ if __name__ == '__main__':
         beta1 = 0.99999
         beta2 = 0.9999
         beta3 = 0.999
-        running_avg_long = 0.0
-        running_avg_medium = 0.0
-        running_avg_short = 0.0
+        running_avg_long = 0.01
+        running_avg_medium = 0.01
+        running_avg_short = 0.01
 
         def callback(indata, frames, time, status):
-            global soundarray, running_avg_long, running_avg_short, running_avg_medium
+            global soundarray#, running_avg_long, running_avg_short, running_avg_medium
             soundarray = np.append(soundarray, indata)
-            for i in indata:
-                i = abs(i)
-                running_avg_long = running_avg_long * beta1 + i *(1-beta1)
-                running_avg_medium = running_avg_medium * beta2 + i *(1-beta2)
-                running_avg_short = running_avg_short * beta3 + i *(1-beta3)
+            # for i in indata:
+            #     i = abs(i)
+            #     running_avg_long = running_avg_long * beta1 + i *(1-beta1)
+            #     running_avg_medium = running_avg_medium * beta2 + i *(1-beta2)
+            #     running_avg_short = running_avg_short * beta3 + i *(1-beta3)
             if len(soundarray) > save_intervall*fs:
                 soundarray = soundarray[int(-save_intervall*fs):]
         print("samplerate: ", fs)
