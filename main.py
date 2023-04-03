@@ -245,7 +245,7 @@ if __name__ == '__main__':
                                 for i in range(strip.numPixels()):
                                     color =  wheel( (int(i*(255/strip.numPixels())+255/ 5 * j)) & 255)
                                   #  print(color)
-                                    color = Color(int(color[0]*lvl),int(color[1]*lvl),int(color[2]*lvl))
+                                    color = Color(int(color[0]),int(color[1]),int(color[2]))
                                     strip.setPixelColor(i, color)
                                 strip.show()
                         if mode == 1:
