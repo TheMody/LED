@@ -109,9 +109,9 @@ def modulate_by_max(sound, intervall = 1000):
 def modulate_by_mean(sound, intervall = 1000):
     return np.mean(np.abs(sound[-intervall:]))/np.max(np.abs(sound))
 
-def detect_sudden_change(sound, threshold = 0.2):
-    avg_now = np.mean(np.abs(sound[int(-fs*save_intervall/2):])) 
-    avg_before = np.mean(np.abs(sound[:int(-fs*save_intervall/2)])) 
+def detect_sudden_change(sound, threshold = 1.0):
+    avg_now = np.mean(np.abs(sound[-1000:])) 
+    avg_before = np.mean(np.abs(sound)) 
     return avg_now  > (1 +threshold)* avg_before or avg_now  <  (1-threshold)* avg_before
 
     
@@ -254,19 +254,19 @@ if __name__ == '__main__':
                             strip.show()
                         onsets, size = AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.4, window_size=512)
                         if len(onsets) > 0 :
-                            if onsets[-1] >  (len(soundarray) - 1025) and ((time.time()-waittime) > 0.500):
-                                print("onset", onsets, size)
+                            if onsets[-1] >  (len(soundarray) - 1025) and ((time.time()-waittime) > 1025/fs):
+                               # print("onset", onsets, size)
                                 waittime = time.time()
                                 j = j+1
                         # onsets = AmplitudeBasedOnsets(soundarray,distance=10, prominence=0.4)
                         # if len(onsets) > 0 :
                         #     if onsets[-1] >  (len(soundarray) - 1000):
                         #         print("onset", onsets)
-                        # if detect_sudden_change(soundarray) & ((time.time()-waittime) > 0.500):
-                        #     mode = mode +1
-                        #     waittime = time.time()
-                        #     if mode >1:
-                        #         mode = 0
+                        if detect_sudden_change(soundarray) & ((time.time()-waittime2) > 0.500):
+                            mode = mode +1
+                            waittime2 = time.time()
+                            if mode >0:
+                                mode = 0
 
         while True:
             print('Color wipe animations.')
