@@ -239,7 +239,7 @@ if __name__ == '__main__':
                     bright = int(min(255,max(0,int(lvl*255 ))))
                   #  print("lvl",lvl)
                     if not test:
-                        if mode == 0:
+                        if mode == 1:
                           #  if time.time()-waittime2 > 0.2:
                             #    waittime2 = time.time()
                                # for j in range(256 * 5):
@@ -253,7 +253,7 @@ if __name__ == '__main__':
                                     color = Color(int(color[0]),int(color[1]),int(color[2]))
                                     strip.setPixelColor(i, color)
                                 strip.show()
-                        if mode == 1:
+                        if mode == 0:
                             for i in range(strip.numPixels()):
                                 strip.setPixelColor(i,  Color(bright, bright, bright))
                             strip.show()
