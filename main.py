@@ -11,8 +11,9 @@ import numpy as np
 import time
 from rpi_ws281x import PixelStrip, Color
 import argparse
+import queue
 #from test import SpectralBasedOnsets, AmplitudeBasedOnsets
-from utils import AmplitudeBasedOnsets
+from utils import AmplitudeBasedOnsets, processAmplitutde, AmplitudeBasedOnsets_from_processed
 
 # LED strip configuration:
 LED_COUNT = 16        # Number of LED pixels.
@@ -142,65 +143,96 @@ if __name__ == '__main__':
         beta1 = 0.99999
         beta2 = 0.9999
         beta3 = 0.999
+        time_window = 256
         running_avg_long = 0.01
         running_avg_medium = 0.01
         running_avg_short = 0.01
-        new_data = 0
+        un_processed_beats = np.asarray([])
+        processed_beats = np.asarray([])#[0]*int(fs * save_intervall / time_window))
+        previous_length = 0
 
         def callback(indata, frames, time, status):
-            global soundarray, new_data, running_avg_long, running_avg_short, running_avg_medium
+            global soundarray
+          #  print(len(indata))
+            print(len(soundarray))
             soundarray = np.append(soundarray, indata[np.arange(0, len(indata), 2)])
-            new_data = new_data + int(len(indata)/2)
-            for i in indata:
-                i = abs(i)
-                running_avg_long = running_avg_long * beta1 + i *(1-beta1)
-                running_avg_medium = running_avg_medium * beta2 + i *(1-beta2)
-                running_avg_short = running_avg_short * beta3 + i *(1-beta3)
+          #  un_processed_beats = np.append(un_processed_beats, indata[np.arange(0, len(indata), 2)])
+           # new_data = new_data + int(len(indata)/2)
+            # for i in indata:
+            #     i = abs(i)
+            #     running_avg_long = running_avg_long * beta1 + i *(1-beta1)
+            #     running_avg_medium = running_avg_medium * beta2 + i *(1-beta2)
+            #     running_avg_short = running_avg_short * beta3 + i *(1-beta3)
+
+        q = queue.Queue()
+
+
+        def audio_callback(indata, frames, time, status):
+            """This is called (from a separate thread) for each audio block."""
+            # if status:
+            #     print(status, file=sys.stderr)
+            # Fancy indexing with mapping creates a (necessary!) copy:
+            q.put(indata[::2, 0])
 
         print("samplerate: ", fs)
-        with sd.InputStream(channels=1, callback=callback,  samplerate=fs):
+        fulltime = time.time()
+        with sd.InputStream(channels=1, samplerate=fs, callback=audio_callback):
             while True:	 
-            #     myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1)
-            #     sd.wait()
-            #     myrecording = np.asarray(myrecording)
-            #     soundarray = np.append(soundarray, myrecording)
-            #     myrecording = sd.rec(int(buffer_intervall * fs), samplerate=fs, channels=1)
-            #     if len(soundarray) > save_intervall*fs:
-            #         soundarray = soundarray[int(-save_intervall*fs):]
-            # #  print(np.max(soundarray[-1000:]))
+                indata = stream.read(stream.read_available)[0]
+
+                for i in indata:
+                    i = abs(i)
+                    running_avg_long = running_avg_long * beta1 + i *(1-beta1)
+                    running_avg_medium = running_avg_medium * beta2 + i *(1-beta2)
+                    running_avg_short = running_avg_short * beta3 + i *(1-beta3)
+                soundarray = np.append(soundarray, indata[np.arange(0, len(indata), 2)])
+                un_processed_beats = np.append(un_processed_beats, soundarray[previous_length:])
+                previous_length = len(soundarray)
                 if len(soundarray) > save_intervall*fs/2:
                     soundarray = soundarray[-int(fs*save_intervall/2):]
+
+                
+
                 if len(soundarray) > int(0.1*fs):
                 # lvl = np.mean(np.abs(soundarray[-1000:]))
-
+                    plt.plot(soundarray)
+                    plt.show()
                     if test:
-                    # plt.plot(soundarray)
-                    # plt.show()
-                       # start = time.time()
-                        #print(soundarray.shape)
-                      #  print(detect_sudden_change(soundarray))
-                    #     hop_length = 256
-                    #     # tempo, beats = librosa.beat.beat_track(y=soundarray, sr=fs, hop_length=hop_length)
-                    #     # print("tempo", tempo)
-                    #     # print("beats", beats)
-                    #     # plt.plot(soundarray)
-                    #     # plt.title("Signal with Beats")
-                    #     # beats = beats*hop_length
-                    #     # for k in range(len(beats)):
-                    #     # #  if(beats[k] < SR):
-                    #     #     plt.plot([beats[k],beats[k]],[-1,1],color='r')    
-                    #     # plt.show()
                         start = time.time()
-                        onsets, size = AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.4, window_size=512)#, displayAll=True)
+                      #  print(len(un_processed_beats))
+                       # print(len(soundarray))
+                        if len(un_processed_beats)> time_window*2:
+                            processed_beats = np.append(processed_beats, processAmplitutde(un_processed_beats))
+                            print(len(processAmplitutde(un_processed_beats)))
+                           # processed_beats.append(processAmplitutde(un_processed_beats))
+                           # print("before",len(un_processed_beats))
+                            un_processed_beats = un_processed_beats[ -(time_window + len(un_processed_beats) % time_window):]
+                          #  print("after",len(un_processed_beats))
+                      # print(len(processed_beats))
+                        if len(processed_beats) > fs * save_intervall / time_window:
+                            print("time to full", time.time()-fulltime)
+                            processed_beats = processed_beats[-int(fs * save_intervall / time_window):]
+                           # print(len(un_processed_beats))
+                       # print("stuff") 
+                      #  print("processed_beats", processed_beats)
+                     #   start = time.time()
+                        onsets, size = AmplitudeBasedOnsets_from_processed(processed_beats, distance=10, prominence=0.4, window_size=512)#, displayAll=True)
+                     #   print("time to process", time.time()-start)
+                     #   print(onsets)
+                        # if len(onsets) > 0:
+                        #     if onsets[-1] > len(processed_beats) - 10:
+                        #         print("onset", size[-1])
+                     #   onsets, size = AmplitudeBasedOnsets(soundarray, distance=10, prominence=0.4, window_size=512)#, displayAll=True)
+                      #  print("time to process", time.time()-start)
                        # print("onsets", onsets, size)
                        # print(onsets)
                          #time_diff = time.time()-start
                         # print(time_diff)
-                        print(time.time()-start)
+                    #    print(time.time()-start)
                       #  print(onsets)
-                        if len(onsets) > 0 :
-                            if onsets[-1] >  (len(soundarray) - 1025):# and size[-1]  >= 0.99:
-                                print("onset", onsets, size)
+                        # if len(onsets) > 0 :
+                        #     if onsets[-1] >  (len(soundarray) - 1025):# and size[-1]  >= 0.99:
+                        #         print("onset", onsets, size)
                     #         # else:
                             #     print("no")
                       #  print(onsets)
@@ -274,8 +306,8 @@ if __name__ == '__main__':
                             if mode >0:
                                 mode = 0
                 
-                print("new data", len(soundarray))
-                print("time since last", time.time()-waittime3)
+           #     print("new data", len(soundarray))
+            #    print("time since last", time.time()-waittime3)
                 waittime3 = time.time()
                 new_data = 0
 

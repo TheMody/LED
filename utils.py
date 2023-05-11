@@ -1,6 +1,6 @@
 import numpy as np
-#import matplotlib.pyplot as plt
-#from scipy.signal import find_peaks
+import matplotlib.pyplot as plt
+from scipy.signal import find_peaks as find_peaks_scipy
 
 def energy(x):
     return (x @ x) / len(x)
@@ -42,6 +42,48 @@ def find_peaks(x,prominence = 0.0,distance = 0, n_size = 5):
     return peaks
 
 
+def processAmplitutde(X,window_size=512,overlap=0.5,scale=10):
+    
+    N = len(X)
+    
+   # X = X / max(X)       # normalize amplitude
+
+    skip = int((1-overlap)*window_size)
+    
+   # print("skip:",skip)
+
+    num_windows = (N // skip) - 1
+
+  #  print("num_windows:",num_windows)
+
+    window_locations = skip * np.arange(num_windows)
+
+  #  print("window_locations:",window_locations)
+
+    X_energy = np.array( [ energy( X[ w : (w+window_size)] ) for w in window_locations ])
+
+   # X_energy = np.array(X_energy)
+
+    if(scale == None):
+        X_energy_log = X_energy
+    else:
+        X_energy_log = np.log(1 + scale*X_energy)
+
+    # if(displayAll):
+    #     plt.figure(figsize=(12,4))
+    #     plt.title("Log X Energy Signal with scale factor "+str(scale))
+    #     plt.plot(X_energy_log)
+    #     plt.show()
+
+    X_energy_log = np.concatenate([[np.mean(X_energy_log)],X_energy_log])    
+
+    # Take the discrete differential; watch out, diff transforms array in place
+
+    X_energy_novelty = np.diff(list(X_energy_log)) 
+
+    return X_energy_novelty
+
+
 def AmplitudeBasedOnsets(X,window_size=512,overlap=0.5,scale=10,
                          height=None,
                          prominence=None,
@@ -66,7 +108,7 @@ def AmplitudeBasedOnsets(X,window_size=512,overlap=0.5,scale=10,
 
     X_energy = np.array( [ energy( X[ w : (w+window_size)] ) for w in window_locations ])
 
-    X_energy = np.array(X_energy)
+   # X_energy = np.array(X_energy)
 
     if(scale == None):
         X_energy_log = X_energy
@@ -104,9 +146,11 @@ def AmplitudeBasedOnsets(X,window_size=512,overlap=0.5,scale=10,
     #     plt.show()
 
     # peak picking
-
+    import time
+    start = time.time()
+    print(X_energy_novelty_rectified.shape)
     peaks = find_peaks(X_energy_novelty_rectified,prominence=prominence,distance=distance)  
-   
+    print("Time taken:",time.time()-start)
 
     if(len(peaks)==0):
     #    print("No peaks found!")
@@ -133,3 +177,63 @@ def AmplitudeBasedOnsets(X,window_size=512,overlap=0.5,scale=10,
     #     plt.show()
 
     return onsets, size_of_peaks
+
+def AmplitudeBasedOnsets_from_processed(X,window_size=512,overlap=0.5,
+                         height=None,
+                         prominence=None,
+                         distance=None,
+                         displayAll=False):
+    
+   # skip = int((1-overlap)*window_size)
+    
+    X_energy_novelty = X / max(X)
+    
+    # if(displayAll):
+    #     plt.figure(figsize=(12,4))
+    #     plt.title("X Energy Novelty")
+    #     plt.plot(X_energy_novelty)
+    #     plt.show()
+
+    X_energy_novelty_rectified = rectify(X_energy_novelty)      
+    
+    # if(displayAll):
+    #     plt.figure(figsize=(12,4))
+    #     plt.title("Rectified X Energy Novelty")
+    #     plt.plot(X_energy_novelty_rectified)
+    #     plt.show()
+
+    # peak picking
+    import time
+
+    start = time.time()
+    #print(X_energy_novelty_rectified.shape)
+    peaks = find_peaks(X_energy_novelty_rectified,prominence=prominence,distance=distance)  
+   # peaks = find_peaks_scipy(X_energy_novelty_rectified,prominence=prominence,distance=distance)[0]
+    #print(peaks)
+   # print("find_peaks took",time.time()-start,"seconds")
+
+    if(len(peaks)==0):
+    #    print("No peaks found!")
+        return np.array([]), np.array([])
+    
+    size_of_peaks = X_energy_novelty_rectified[peaks]
+    if(displayAll):
+        plt.figure(figsize=(12,4))
+        plt.title("Picking Peaks")
+        plt.plot(peaks, X_energy_novelty_rectified[peaks], "or")
+        plt.plot(X_energy_novelty_rectified)
+        plt.show()
+    
+    # peaks are beginning of window, more accurate to make the onsets in the middle
+    # of the window, reduces potential error by 1/2y
+    
+    #onsets = peaks*skip + window_size//2
+    # if(displayAll):
+    #     plt.figure(figsize=(12,4))
+    #     plt.title("Signal with Onsets")
+    #     plt.plot(X)
+    #     for k in range(len(onsets)):
+    #         plt.plot([onsets[k],onsets[k]],[-1,1],color='r')    
+    #     plt.show()
+
+    return peaks, size_of_peaks
