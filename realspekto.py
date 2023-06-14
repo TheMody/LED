@@ -7,8 +7,13 @@ import shutil
 import numpy as np
 import sounddevice as sd
 import time as pytime
+from utils import find_peaks
+from stripsfunctions import stripManager
 
 usage_line = ' press <enter> to quit, +<enter> or -<enter> to change scaling '
+
+def num_instruments(spekto):
+    return find_peaks(spekto)
 
 class walker():
     def __init__(self, init, tolerance = 5) -> None:
@@ -28,6 +33,8 @@ class walker():
             return 1
         else:
             return 0
+
+
 
 
 def int_or_str(text):
@@ -72,6 +79,8 @@ parser.add_argument(
     metavar=('LOW', 'HIGH'), default=[100, 2000],
     help='frequency range (default %(default)s Hz)')
 args = parser.parse_args(remaining)
+stripshape = [[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6]]
+striplength = np.sum(stripshape)
 low, high = args.range
 if high <= low:
     parser.error('HIGH must be greater than LOW')
@@ -90,46 +99,51 @@ for bg, fg in zip(colors, colors[1:]):
 
 try:
     samplerate = sd.query_devices(args.device, 'input')['default_samplerate']
-
-    delta_f = (high - low) / (args.columns - 1)
+    delta_f = (high - low) / (striplength- 1)
     fftsize = math.ceil(samplerate / delta_f)
     low_bin = math.floor(low / delta_f)
-    long_avg = 100
-    beta = 0.9
-    spektohist = np.zeros((0,args.columns))
-    waittime = pytime.time()
+    sManager = stripManager(stripshape,samplerate, fftsize, low_bin ,test = True)
+
+
+
 
     def callback(indata, frames, time, status):
-        global long_avg, waittime, spektohist
+        global long_avg, waittime, spektohist, meanmeanfreq
         if status:
             text = ' ' + str(status) + ' '
             print('\x1b[34;40m', text.center(args.columns, '#'),
                   '\x1b[0m', sep='')
         if any(indata):
-            magnitude = np.abs(np.fft.rfft(indata[:, 0], n=fftsize))
-            magnitude *= args.gain / fftsize
-            spektogram = np.clip(magnitude[low_bin:low_bin + args.columns], 0, 1)
-            spektohist = np.append(spektohist, [spektogram], axis=0)
-            if spektohist.shape[0] > 100:
-                # for spekto in spektohist:
-                #     spketohits = np.sum(spektohist * spekto, axis = 1)
-                spektohist = np.delete(spektohist, 0, 0)
-           # print(spektohist.shape)
-            spektosum = np.sum(spektogram)
-            long_avg = long_avg*beta + spektosum*(1-beta)
-           # print(long_avg)
-            if long_avg < 3 and waittime + 2 < pytime.time():
-                args.gain *= 1.5
-                waittime = pytime.time()
-                print("adjusted gain to", args.gain)
-            if long_avg > 8 and waittime + 2 < pytime.time():
-                args.gain /= 1.5
-                waittime = pytime.time()
-                print("adjusted gain to", args.gain)
-            line = (gradient[int(np.clip(x, 0, 1) * (len(gradient) - 1))]
-                    for x in magnitude[low_bin:low_bin + args.columns])
+            sManager.visualize(indata)
+        #     magnitude = np.abs(np.fft.rfft(indata[:, 0], n=fftsize))
+        #     magnitude *= args.gain / fftsize
+        #     spektogram = np.clip(magnitude[low_bin:low_bin + args.columns], 0, 1)
+        #     spektohist = np.append(spektohist, [spektogram], axis=0)
+        #     if spektohist.shape[0] > 100:
+        #         spektohist = np.delete(spektohist, 0, 0)
+        #     if np.mean(spektogram[:5]) > 0.3:
+        #         print("bass")
             
-            print(*line, sep='', end='\x1b[0m\n')
+        #     #print(len(find_peaks(spektogram,0.4,10)))
+        #     spektosum = np.sum(spektogram)
+        #     meanfreq = np.sum(spektogram/spektosum * np.arange(0,len(spektogram)))
+        #     meanmeanfreq = meanmeanfreq*beta + meanfreq*(1-beta)
+        #   #  print(meanmeanfreq)
+        #     long_avg = long_avg*beta + spektosum*(1-beta)
+        #    # print(long_avg)
+        #     if long_avg < 3 and waittime + 2 < pytime.time():
+        #         args.gain *= 1.5
+        #         waittime = pytime.time()
+        #         print("adjusted gain to", args.gain)
+        #     if long_avg > 8 and waittime + 2 < pytime.time():
+        #         args.gain /= 1.5
+        #         waittime = pytime.time()
+        #         print("adjusted gain to", args.gain)
+        #     line = (gradient[int(np.clip(x, 0, 1) * (len(gradient) - 1))]
+        #             for x in magnitude[low_bin:low_bin + args.columns])
+
+            
+        #     print(*line, sep='', end='\x1b[0m\n')
         else:
             print('no input')
 
