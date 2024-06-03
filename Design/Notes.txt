@@ -1,0 +1,34 @@
+
+
+54 LEds on the back in descending stripes. x2
+
+37 LEds in a hexagon on the breast x2
+
+33 leds on the elbows x2 (maybe not a great idea for movement)
+
+28 leds on the shoulders x2
+maybe another 28 leds on the shoulders x2
+
+adds up to 304 leds, have atm only 300. should be fine, maybe smaller elbows.
+
+Modes:
+everything spectorgramm
+everything amplitude
+mixed could be:
+back spectro
+breast also spectro
+rest amplitude
+
+
+Components:
+LEDS: 5M a 60 LEDS pro M 5V WS2812B LED, WS2811  https://www.amazon.de/dp/B01CDTEJBG?psc=1&ref=ppx_yo2ov_dt_b_product_details
+Microphone: KonferenzMikro Omnidirektional https://www.amazon.de/dp/B08R8G7VM2?psc=1&ref=ppx_yo2ov_dt_b_product_details
+Controler: Raspberry Pi 3
+Battery: LiPo (übergangsmäßig ist ziemlich kaputt)
+
+
+TODO:
+
+Software, but kinda done already
+Design circuit.
+Create first patches. (Maybe start with breasts or back)
