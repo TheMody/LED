@@ -13,12 +13,12 @@ LED_INVERT = False    # True to invert the signal (when using NPN transistor lev
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
 # Define functions which animate LEDs in various ways.
-def colorWipe(strip, color, wait_ms=50):
+def colorWipe(strip, color):
     """Wipe color across display a pixel at a time."""
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, color)
         strip.show()
-        time.sleep(wait_ms / 1000.0)
+        #time.sleep(wait_ms / 1000.0)
 
 
 def theaterChase(strip, color, wait_ms=50, iterations=10):
@@ -180,17 +180,20 @@ class stripManager():
                     print(printline, sep='')
 
         else:
-            print("test")
-            # for k,chunk in enumerate(self.layout):
-            #     for a,line in enumerate(chunk):
-            #         for i in range(line):
-            #             color = Color(int(self.pixel_values[k][a][i][0]*255),int(self.pixel_values[k][a][i][1]*255),int(self.pixel_values[k][a][i][2]*255))
-            #             self.strip.setPixelColor(i, color)
-            #     self.strip.show()
+        #    print("test")
+            for k,chunk in enumerate(self.layout):
+                for a,line in enumerate(chunk):
+                    for i in range(line):
+                        color = Color(int(self.pixel_values[k][a][i][0]*255),int(self.pixel_values[k][a][i][1]*255),int(self.pixel_values[k][a][i][2]*255))
+                        self.strip.setPixelColor(i, color)
+                self.strip.show()
             #     time.sleep(0.01)
-            for i in range(self.strip.numPixels()):
-                self.strip.setPixelColor(i,  Color(255, 255, 255))
-            self.strip.show()
+            # for i in range(self.strip.numPixels()):
+            #     self.strip.setPixelColor(i,  Color(255, 255, 255))
+            # self.strip.show()
 
+    def __delete__(self):
+        colorWipe(self.strip, Color(0, 0, 0))
+        super.__delete__(self)
         
         
