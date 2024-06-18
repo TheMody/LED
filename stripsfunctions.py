@@ -103,6 +103,11 @@ class stripManager():
     # strips are configured in chunks which are defined as 2D arrays which are defining the number of strips as well as the number of pixels per strip
     def __init__(self, layout,samplerate ,fftsize, low_bin,test = False, gain = 10):
         self.layout = layout
+        self.chunks = [chunk for chunk in self.layout]
+        self.lines = [line for chunk in self.layout for line in chunk]
+        self.max_length = np.max(self.lines)
+
+        print("max_length", self.max_length)
         self.gain = gain
         self.low_bin = low_bin
         self.samplerate = samplerate
@@ -175,8 +180,10 @@ class stripManager():
             for k,chunk in enumerate(self.layout):
                     printline = ""
                     for a,line in enumerate(chunk):
-                            printline = printline + "".join([vishelper[int(x * (len(vishelper) - 1))]
-                                for x in self.pixel_values[k][a]]) + "\n"  
+                          
+                          #  print(self.pixel_values[k][a][i])
+                         #   printline = printline + "".join([str(x) + " " for x in self.pixel_values[k][a]]) + "\n"
+                            printline = printline + "".join([vishelper[int(x * (len(vishelper) - 1))] for x in self.pixel_values[k][a]]) + "\n"  
                     print(printline, sep='')
 
         else:
@@ -185,7 +192,9 @@ class stripManager():
                 for a,line in enumerate(chunk):
                     for i in range(line):
                         color = Color(int(self.pixel_values[k][a][i]*255),int(self.pixel_values[k][a][i]*255),int(self.pixel_values[k][a][i]*255))
-                        self.strip.setPixelColor(i, color)
+                        ledpos = i+a*self.max_length
+                        if not ledpos  >= self.num_leds: 
+                            self.strip.setPixelColor(ledpos, color)
                 self.strip.show()
             #     time.sleep(0.01)
             # for i in range(self.strip.numPixels()):
