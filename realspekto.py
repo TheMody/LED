@@ -77,7 +77,7 @@ parser.add_argument(
     help='frequency range (default %(default)s Hz)')
 args = parser.parse_args(remaining)
 #stripshape = [[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6]]
-stripshape = [[3,6,10,12,12,12]]
+stripshape = [[12,12,12,10,6,3]]
 striplength = np.sum(stripshape)
 low, high = args.range
 if high <= low:
