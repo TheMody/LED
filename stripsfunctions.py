@@ -189,10 +189,15 @@ class stripManager():
         else:
         #    print("test")
             pos = 0
+            invert = True
             for k,chunk in enumerate(self.layout):
                 for a,line in enumerate(chunk):
+                    invert = not invert
                     for i in range(line):
-                        color = Color(int(self.pixel_values[k][a][i]*255),int(self.pixel_values[k][a][i]*255),int(self.pixel_values[k][a][i]*255))
+                        if invert:
+                            color = Color(int(self.pixel_values[k][a][-i]*255),int(self.pixel_values[k][a][-i]*255),int(self.pixel_values[k][a][-i]*255))
+                        else:
+                            color = Color(int(self.pixel_values[k][a][i]*255),int(self.pixel_values[k][a][i]*255),int(self.pixel_values[k][a][i]*255))
                         if not pos  >= self.num_leds: 
                             self.strip.setPixelColor(pos, color)
                         pos = pos + 1
