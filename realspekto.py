@@ -79,7 +79,8 @@ parser.add_argument(
     metavar=('LOW', 'HIGH'), default=[100, 2000],
     help='frequency range (default %(default)s Hz)')
 args = parser.parse_args(remaining)
-stripshape = [[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6]]
+#stripshape = [[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6]]
+stripshape = [[3,6,10,12,12,12]]
 striplength = np.sum(stripshape)
 low, high = args.range
 if high <= low:
@@ -108,12 +109,13 @@ try:
 
 
     def callback(indata, frames, time, status):
-        global long_avg, waittime, spektohist, meanmeanfreq
+   #     global long_avg, waittime, spektohist, meanmeanfreq
         if status:
             text = ' ' + str(status) + ' '
             print('\x1b[34;40m', text.center(args.columns, '#'),
                   '\x1b[0m', sep='')
         if any(indata):
+           # print(indata)
             sManager.visualize(indata)
         #     magnitude = np.abs(np.fft.rfft(indata[:, 0], n=fftsize))
         #     magnitude *= args.gain / fftsize

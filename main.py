@@ -176,7 +176,7 @@ if __name__ == '__main__':
 
         print("samplerate: ", fs)
         fulltime = time.time()
-        with sd.InputStream(channels=1, samplerate=fs, callback=audio_callback):
+        with sd.InputStream(channels=1, samplerate=fs, callback=audio_callback) :
             while True:	 
                 indata = stream.read(stream.read_available)[0]
 

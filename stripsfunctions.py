@@ -108,7 +108,8 @@ class stripManager():
         self.samplerate = samplerate
         self.fftsize = fftsize
         self.num_leds = np.sum(self.layout)
-        
+        self.mode = "fillchunksbyspekto"
+        self.pixel_values = [[[0 for pixel in range(line)] for line in chunk] for chunk in self.layout]
         #[[ PixelStrip(self.num_leds, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
          #for led_count in chunk] for chunk in self.layout ]
         #PixelStrip(300, 18, 800000, 5, False, 255, 0)
@@ -116,11 +117,12 @@ class stripManager():
             self.strip = PixelStrip(self.num_leds, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
             self.strip.begin()
         else:
+            
             self.visualizeascii = True
         self.waittime =  time.time()
         self.long_avg = 100
         
-        spektohist = np.zeros((0,self.num_leds))
+        self.spektohist = np.zeros((200,self.num_leds))
         self.meanmeanfreq = 0
 
     def visualize(self,indata):
@@ -128,9 +130,9 @@ class stripManager():
         magnitude = np.abs(np.fft.rfft(indata[:, 0], n=self.fftsize))
         magnitude *= self.gain / self.fftsize
         spektogram = np.clip(magnitude[self.low_bin:self.low_bin + self.num_leds], 0, 1)
-      #  spektohist = np.append(spektohist, [spektogram], axis=0)
-     #   if spektohist.shape[0] > 100:
-       #     spektohist = np.delete(spektohist, 0, 0)
+        self.spektohist = np.append(self.spektohist, [spektogram], axis=0)
+        if self.spektohist.shape[0] > 200:
+            self.spektohist = np.delete(self.spektohist, 0, 0)
         if np.mean(spektogram[:int(self.num_leds/16)]) > 0.3:
             print("bass")
         
@@ -149,8 +151,45 @@ class stripManager():
             self.gain /= 1.5
             self.waittime = time.time()
             print("adjusted gain to", self.gain)
-        if self.visualizeascii:
-            line = (vishelper[int(np.clip(x, 0, 1) * (len(vishelper) - 1))]
-                for x in spektogram)
+
+        if self.mode == "fillchunksbyspekto":
+              for k,chunk in enumerate(self.layout):
+                    printline = ""
+                    for a,line in enumerate(chunk):
+                            self.pixel_values[k][a] = [np.mean(self.spektohist[-((a+1)*5+1):-((a)*5+1),int(i*len(spektogram)/line):int((i+1)*len(spektogram)/line)], axis = (0,1)) for i in range(line)]
         
-        print(*line, sep='', end='\x1b[0m\n')
+        if self.mode == "fillchunksbymag":
+              for k,chunk in enumerate(self.layout):
+                    printline = ""
+                    for a,line in enumerate(chunk):
+                            self.pixel_values[k][a] = [np.mean(self.spektohist[-((a+1)*5+1):-((a)*5+1),:], axis = (0,1))*3 for i in range(line)]
+
+        if self.mode == "fillchunksbymagcurrent":
+              for k,chunk in enumerate(self.layout):
+                    printline = ""
+                    for a,line in enumerate(chunk):
+                            self.pixel_values[k][a] = [np.mean(self.spektohist[0], axis = (0))*3 for i in range(line)]
+        
+        
+        if self.visualizeascii:
+            for k,chunk in enumerate(self.layout):
+                    printline = ""
+                    for a,line in enumerate(chunk):
+                            printline = printline + "".join([vishelper[int(x * (len(vishelper) - 1))]
+                                for x in self.pixel_values[k][a]]) + "\n"  
+                    print(printline, sep='')
+
+        else:
+            for k,chunk in enumerate(self.layout):
+                for a,line in enumerate(chunk):
+                    for i in range(line):
+                        color = Color(int(self.pixel_values[k][a][i][0]*255),int(self.pixel_values[k][a][i][1]*255),int(self.pixel_values[k][a][i][2]*255))
+                        self.strip.setPixelColor(i, color)
+                self.strip.show()
+                time.sleep(0.01)
+                #  for i in range(strip.numPixels()):
+                #                 strip.setPixelColor(i,  Color(bright, bright, bright))
+                #             strip.show()
+
+        
+        
