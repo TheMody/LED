@@ -100,7 +100,7 @@ try:
     delta_f = (high - low) / (striplength- 1)
     fftsize = math.ceil(samplerate / delta_f)
     low_bin = math.floor(low / delta_f)
-    sManager = stripManager(stripshape,samplerate, fftsize, low_bin ,test = True)
+    sManager = stripManager(stripshape,samplerate, fftsize, low_bin ,test = False)
 
 
 

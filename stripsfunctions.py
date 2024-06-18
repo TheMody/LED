@@ -114,10 +114,10 @@ class stripManager():
          #for led_count in chunk] for chunk in self.layout ]
         #PixelStrip(300, 18, 800000, 5, False, 255, 0)
         if not test:    
-            self.strip = PixelStrip(self.num_leds, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
+            self.visualizeascii = False
+            self.strip = PixelStrip(int(self.num_leds), LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
             self.strip.begin()
         else:
-            
             self.visualizeascii = True
         self.waittime =  time.time()
         self.long_avg = 100
@@ -180,6 +180,7 @@ class stripManager():
                     print(printline, sep='')
 
         else:
+            print("test")
             # for k,chunk in enumerate(self.layout):
             #     for a,line in enumerate(chunk):
             #         for i in range(line):
@@ -188,7 +189,7 @@ class stripManager():
             #     self.strip.show()
             #     time.sleep(0.01)
             for i in range(self.strip.numPixels()):
-                    self.strip.setPixelColor(i,  Color(255, 255, 255))
+                self.strip.setPixelColor(i,  Color(255, 255, 255))
             self.strip.show()
 
         
