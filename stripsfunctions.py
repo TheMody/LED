@@ -193,9 +193,9 @@ class stripManager():
                 for a,line in enumerate(chunk):
                     for i in range(line):
                         color = Color(int(self.pixel_values[k][a][i]*255),int(self.pixel_values[k][a][i]*255),int(self.pixel_values[k][a][i]*255))
-                        pos = pos + 1
                         if not pos  >= self.num_leds: 
                             self.strip.setPixelColor(pos, color)
+                        pos = pos + 1
                 self.strip.show()
             #     time.sleep(0.01)
             # for i in range(self.strip.numPixels()):
