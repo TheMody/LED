@@ -7,13 +7,10 @@ import shutil
 import numpy as np
 import sounddevice as sd
 import time as pytime
-from utils import find_peaks
 from stripsfunctions import stripManager
 
 usage_line = ' press <enter> to quit, +<enter> or -<enter> to change scaling '
 
-def num_instruments(spekto):
-    return find_peaks(spekto)
 
 class walker():
     def __init__(self, init, tolerance = 5) -> None:
