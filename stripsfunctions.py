@@ -184,7 +184,7 @@ class stripManager():
             for k,chunk in enumerate(self.layout):
                 for a,line in enumerate(chunk):
                     for i in range(line):
-                        color = Color(int(self.pixel_values[k][a][i][0]*255),int(self.pixel_values[k][a][i][1]*255),int(self.pixel_values[k][a][i][2]*255))
+                        color = Color(int(self.pixel_values[k][a][i]*255),int(self.pixel_values[k][a][i]*255),int(self.pixel_values[k][a][i]*255))
                         self.strip.setPixelColor(i, color)
                 self.strip.show()
             #     time.sleep(0.01)
