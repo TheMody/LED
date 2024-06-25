@@ -1,7 +1,7 @@
 from rpi_ws281x import PixelStrip, Color
 import time
 import numpy as np
-
+from visualize import display
 
 #LED_COUNT = 16        # Number of LED pixels.
 LED_PIN = 18          # GPIO pin connected to the pixels (18 uses PWM!).
@@ -118,12 +118,17 @@ class stripManager():
         #[[ PixelStrip(self.num_leds, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
          #for led_count in chunk] for chunk in self.layout ]
         #PixelStrip(300, 18, 800000, 5, False, 255, 0)
+        print(test)
         if not test:    
             self.visualizeascii = False
             self.strip = PixelStrip(int(self.num_leds), LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
             self.strip.begin()
         else:
             self.visualizeascii = True
+
+
+            self.display = display()
+
         self.waittime =  time.time()
         self.long_avg = 100
         
@@ -177,14 +182,17 @@ class stripManager():
         
         
         if self.visualizeascii:
-            for k,chunk in enumerate(self.layout):
-                    printline = ""
-                    for a,line in enumerate(chunk):
+           # print()
+          # print
+            self.display.draw(self.pixel_values)
+            # for k,chunk in enumerate(self.layout):
+            #         printline = ""
+            #         for a,line in enumerate(chunk):
                           
-                          #  print(self.pixel_values[k][a][i])
-                         #   printline = printline + "".join([str(x) + " " for x in self.pixel_values[k][a]]) + "\n"
-                            printline = printline + "".join([vishelper[int(x * (len(vishelper) - 1))] for x in self.pixel_values[k][a]]) + "\n"  
-                    print(printline, sep='')
+            #               #  print(self.pixel_values[k][a][i])
+            #              #   printline = printline + "".join([str(x) + " " for x in self.pixel_values[k][a]]) + "\n"
+            #                 printline = printline + "".join([vishelper[int(x * (len(vishelper) - 1))] for x in self.pixel_values[k][a]]) + "\n"  
+            #         print(printline, sep='')
 
         else:
         #    print("test")

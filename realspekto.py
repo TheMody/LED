@@ -12,25 +12,6 @@ from stripsfunctions import stripManager
 usage_line = ' press <enter> to quit, +<enter> or -<enter> to change scaling '
 
 
-class walker():
-    def __init__(self, init, tolerance = 5) -> None:
-        self.mean = init
-        self.amplitude = 0.1
-        self.var = tolerance
-        self.hist = []
-        self.speed = 0.1
-        pass
-
-    def next_step(self, spekto):
-        region_of_interest = spekto[int(self.mean-self.var):int(self.mean+self.var)]
-        if np.max(region_of_interest) > self.amplitude*0.5:
-            self.mean = np.argmax(region_of_interest) * self.speed + self.mean *(1-self.speed)
-            self.amplitude = np.max(region_of_interest) * self.speed + self.amplitude *(1-self.speed)
-            self.hist.append(self.mean)
-            return 1
-        else:
-            return 0
-
 
 
 
