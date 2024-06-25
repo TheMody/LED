@@ -6,8 +6,10 @@ import shutil
 
 import numpy as np
 import sounddevice as sd
-import time as pytime
+#import time as pytime
 from stripsfunctions import stripManager
+
+
 
 usage_line = ' press <enter> to quit, +<enter> or -<enter> to change scaling '
 
