@@ -1,7 +1,7 @@
 from rpi_ws281x import PixelStrip, Color
 import time
 import numpy as np
-from visualize import display
+
 
 #LED_COUNT = 16        # Number of LED pixels.
 LED_PIN = 18          # GPIO pin connected to the pixels (18 uses PWM!).
@@ -125,8 +125,7 @@ class stripManager():
             self.strip.begin()
         else:
             self.visualizeascii = True
-
-
+            from visualize import display
             self.display = display()
 
         self.waittime =  time.time()
