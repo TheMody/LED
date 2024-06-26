@@ -2,7 +2,6 @@ from rpi_ws281x import PixelStrip, Color
 import time
 import numpy as np
 
-
 #LED_COUNT = 16        # Number of LED pixels.
 LED_PIN = 18          # GPIO pin connected to the pixels (18 uses PWM!).
 # LED_PIN = 10        # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
@@ -107,6 +106,11 @@ class stripManager():
         self.lines = [line for chunk in self.layout for line in chunk]
         self.max_length = np.max(self.lines)
 
+        import visualizer
+        self.displays = visualizer.display()
+        
+        
+
         print("max_length", self.max_length)
         self.gain = gain
         self.low_bin = low_bin
@@ -118,12 +122,16 @@ class stripManager():
         #[[ PixelStrip(self.num_leds, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
          #for led_count in chunk] for chunk in self.layout ]
         #PixelStrip(300, 18, 800000, 5, False, 255, 0)
+        print(test)
         if not test:    
             self.visualizeascii = False
             self.strip = PixelStrip(int(self.num_leds), LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
             self.strip.begin()
         else:
             self.visualizeascii = True
+            
+          #  self.display = visualize.display()
+
         self.waittime =  time.time()
         self.long_avg = 100
         
@@ -131,6 +139,7 @@ class stripManager():
         self.meanmeanfreq = 0
 
     def visualize(self,indata):
+        self.displays.draw([[[0.5,1,0]]])
         beta = 0.9
         magnitude = np.abs(np.fft.rfft(indata[:, 0], n=self.fftsize))
         magnitude *= self.gain / self.fftsize
@@ -177,6 +186,10 @@ class stripManager():
         
         
         if self.visualizeascii:
+            print()
+        #    self.displays.draw([[[0.5,1,0]]])
+          # print
+        #    self.display.draw(self.pixel_values)
             for k,chunk in enumerate(self.layout):
                     printline = ""
                     for a,line in enumerate(chunk):
