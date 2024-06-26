@@ -180,9 +180,6 @@ class stripManager():
             for k,chunk in enumerate(self.layout):
                     printline = ""
                     for a,line in enumerate(chunk):
-                          
-                          #  print(self.pixel_values[k][a][i])
-                         #   printline = printline + "".join([str(x) + " " for x in self.pixel_values[k][a]]) + "\n"
                             printline = printline + "".join([vishelper[int(x * (len(vishelper) - 1))] for x in self.pixel_values[k][a]]) + "\n"  
                     print(printline, sep='')
 
