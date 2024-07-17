@@ -56,12 +56,12 @@ parser.add_argument(
     help='initial gain factor (default %(default)s)')
 parser.add_argument(
     '-r', '--range', type=float, nargs=2,
-    metavar=('LOW', 'HIGH'), default=[100, 2000],
+    metavar=('LOW', 'HIGH'), default=[50, 500],
     help='frequency range (default %(default)s Hz)')
 args = parser.parse_args(remaining)
 #stripshape = [[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6]]
 stripshape = [[12,12,12,10,6,3]]
-striplength = np.sum(stripshape)
+striplength = np.max(stripshape)
 low, high = args.range
 if high <= low:
     parser.error('HIGH must be greater than LOW')
@@ -84,19 +84,21 @@ try:
     fftsize = math.ceil(samplerate / delta_f)
     low_bin = math.floor(low / delta_f)
     sManager = stripManager(stripshape,samplerate, fftsize, low_bin ,test = True)
-
-
+    buffer = []
 
 
     def callback(indata, frames, time, status):
-   #     global long_avg, waittime, spektohist, meanmeanfreq
+        global buffer
         if status:
             text = ' ' + str(status) + ' '
             print('\x1b[34;40m', text.center(args.columns, '#'),
                   '\x1b[0m', sep='')
         if any(indata):
-           # print(indata)
-            sManager.visualize(indata)
+            buffer = buffer + list(indata[:, 0])
+            if len(buffer) > 10000:
+                sManager.visualize(np.asarray(buffer))
+                buffer = []
+            
         #     magnitude = np.abs(np.fft.rfft(indata[:, 0], n=fftsize))
         #     magnitude *= args.gain / fftsize
         #     spektogram = np.clip(magnitude[low_bin:low_bin + args.columns], 0, 1)

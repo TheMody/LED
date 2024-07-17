@@ -17,7 +17,7 @@ class display():
     def draw(self, grid):
         self.draw_led_grid(self.screen, grid)
     # Function to draw the LED grid
-    def draw_led_grid(self,screen, grid, margin = 5, led_size = 5):
+    def draw_led_grid(self,screen, grid, margin = 20, led_size = 20):
       #  grid = np.asarray(grid)
       #  print(grid.shape)
       screen.fill((0, 0, 0))
