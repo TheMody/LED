@@ -137,18 +137,18 @@ try:
                         samplerate=samplerate):
         while True:
             print("iterating stream")
-            response = input()
-            if response in ('', 'q', 'Q'):
-                break
-            for ch in response:
-                if ch == '+':
-                    args.gain *= 2
-                elif ch == '-':
-                    args.gain /= 2
-                else:
-                    print('\x1b[31;40m', usage_line.center(args.columns, '#'),
-                          '\x1b[0m', sep='')
-                    break
+            # response = input()
+            # if response in ('', 'q', 'Q'):
+            #     break
+            # for ch in response:
+            #     if ch == '+':
+            #         args.gain *= 2
+            #     elif ch == '-':
+            #         args.gain /= 2
+            #     else:
+            #         print('\x1b[31;40m', usage_line.center(args.columns, '#'),
+            #               '\x1b[0m', sep='')
+            #         break
 except KeyboardInterrupt:
     parser.exit('Interrupted by user')
 except Exception as e:
