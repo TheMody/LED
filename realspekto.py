@@ -131,10 +131,12 @@ try:
         else:
             print('no input')
 
+    print('stream started')
     with sd.InputStream(device=args.device, channels=1, callback=callback,
                         blocksize=int(samplerate * args.block_duration / 1000),
                         samplerate=samplerate):
         while True:
+            print("iterating stream")
             response = input()
             if response in ('', 'q', 'Q'):
                 break
