@@ -66,18 +66,8 @@ low, high = args.range
 if high <= low:
     parser.error('HIGH must be greater than LOW')
 
-# Create a nice output gradient using ANSI escape sequences.
-# Stolen from https://gist.github.com/maurisvh/df919538bcef391bc89f
-colors = 30, 34, 35, 91, 93, 97
-chars = ' :%#\t#%:'
-gradient = []
 test = True
-for bg, fg in zip(colors, colors[1:]):
-    for char in chars:
-        if char == '\t':
-            bg, fg = fg, bg
-        else:
-            gradient.append(f'\x1b[{fg};{bg + 10}m{char}')
+
 
 try:
     samplerate = sd.query_devices(args.device, 'input')['default_samplerate']
