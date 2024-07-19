@@ -211,14 +211,19 @@ class stripManager():
                           #  self.pixel_values[k][a] = [np.mean(self.spektohist[-((a+1)*5+1):-((a)*5+1),int(i*len(spektogram)/line):int((i+1)*len(spektogram)/line)], axis = (0,1)) for i in range(line)]
         
         if self.mode == "fillchunksbymag":
-              for k,chunk in enumerate(self.layout):
-                    for a,line in enumerate(chunk):
-                            self.pixel_values[k][a] = [np.mean(self.spektohist[-((a+1)*5+1):-((a)*5+1),:], axis = (0,1))*3 for i in range(line)]
+            for i in range(self.max_width):
+                self.pixel_values[i,:] =  np.mean(self.spektohist[-i,:])
+            #   for k,chunk in enumerate(self.layout):
+            #         for a,line in enumerate(chunk):
+            #                 self.pixel_values[k][a] = [np.mean(self.spektohist[-((a+1)*5+1):-((a)*5+1),:], axis = (0,1))*3 for i in range(line)]
 
+        print(np.mean(self.spektohist[-i]))
         if self.mode == "fillchunksbymagcurrent":
-              for k,chunk in enumerate(self.layout):
-                    for a,line in enumerate(chunk):
-                            self.pixel_values[k][a] = [np.mean(self.spektohist[0], axis = (0))*3 for i in range(line)]
+            for i in range(self.max_width):
+                self.pixel_values[:,:] =  np.mean(self.spektohist[-i])
+            #   for k,chunk in enumerate(self.layout):
+            #         for a,line in enumerate(chunk):
+            #                 self.pixel_values[k][a] = [np.mean(self.spektohist[0], axis = (0))*3 for i in range(line)]
         
         print("time it took for pixel wise assignemnt", time.time() - starttime)
         starttime = time.time()
