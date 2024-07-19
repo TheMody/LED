@@ -1,6 +1,9 @@
 from rpi_ws281x import PixelStrip, Color
+
 import time
 import numpy as np
+
+
 
 #LED_COUNT = 16        # Number of LED pixels.
 LED_PIN = 18          # GPIO pin connected to the pixels (18 uses PWM!).
@@ -83,7 +86,7 @@ def theaterChaseRainbow(strip, wait_ms=50):
             for i in range(0, strip.numPixels(), 3):
                 strip.setPixelColor(i + q, 0)
 
-
+allmodes = ["fillchunksbyspekto", "fillchunksbymag", "fillchunksbymagcurrent"]
 #test layout is 2x3x3
 testlayout = [[3,3,3],[3,3,3]]
 colors = 30, 34, 35, 91, 93, 97
@@ -141,6 +144,17 @@ class stripManager():
         
         self.spektohist = np.zeros((200,55))
         self.meanmeanfreq = 0
+
+    def changevisualization(self):
+        for i in range(len(allmodes)):
+            if self.mode == allmodes[i]:
+                if i == len(allmodes) - 1:
+                    self.mode = allmodes[0]
+                else:
+                    self.mode = allmodes[i+1]
+                break
+
+
 
     def visualize(self,indata):
         print(len(indata))

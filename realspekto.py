@@ -8,7 +8,7 @@ import numpy as np
 import sounddevice as sd
 #import time as pytime
 from stripsfunctions import stripManager
-
+from gpiozero import Button
 
 
 usage_line = ' press <enter> to quit, +<enter> or -<enter> to change scaling '
@@ -85,6 +85,7 @@ try:
     low_bin = math.floor(low / delta_f)
     sManager = stripManager(stripshape,samplerate, fftsize, low_bin ,test = True)
     buffer = []
+    button = Button(17)
 
 
     def callback(indata, frames, time, status):
@@ -136,7 +137,11 @@ try:
                         blocksize=int(samplerate * args.block_duration / 1000),
                         samplerate=samplerate):
         while True:
-            print("iterating stream")
+            if button.is_pressed:
+                print("button pressed")
+                sManager.changevisualization()
+            pass
+           # print("iterating stream")
             # response = input()
             # if response in ('', 'q', 'Q'):
             #     break
