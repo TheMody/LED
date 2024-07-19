@@ -92,36 +92,6 @@ try:
             if len(buffer) > 10000:
                 sManager.visualize(np.asarray(buffer))
                 buffer = []
-            
-        #     magnitude = np.abs(np.fft.rfft(indata[:, 0], n=fftsize))
-        #     magnitude *= args.gain / fftsize
-        #     spektogram = np.clip(magnitude[low_bin:low_bin + args.columns], 0, 1)
-        #     spektohist = np.append(spektohist, [spektogram], axis=0)
-        #     if spektohist.shape[0] > 100:
-        #         spektohist = np.delete(spektohist, 0, 0)
-        #     if np.mean(spektogram[:5]) > 0.3:
-        #         print("bass")
-            
-        #     #print(len(find_peaks(spektogram,0.4,10)))
-        #     spektosum = np.sum(spektogram)
-        #     meanfreq = np.sum(spektogram/spektosum * np.arange(0,len(spektogram)))
-        #     meanmeanfreq = meanmeanfreq*beta + meanfreq*(1-beta)
-        #   #  print(meanmeanfreq)
-        #     long_avg = long_avg*beta + spektosum*(1-beta)
-        #    # print(long_avg)
-        #     if long_avg < 3 and waittime + 2 < pytime.time():
-        #         args.gain *= 1.5
-        #         waittime = pytime.time()
-        #         print("adjusted gain to", args.gain)
-        #     if long_avg > 8 and waittime + 2 < pytime.time():
-        #         args.gain /= 1.5
-        #         waittime = pytime.time()
-        #         print("adjusted gain to", args.gain)
-        #     line = (gradient[int(np.clip(x, 0, 1) * (len(gradient) - 1))]
-        #             for x in magnitude[low_bin:low_bin + args.columns])
-
-            
-        #     print(*line, sep='', end='\x1b[0m\n')
         else:
             print('no input')
 
@@ -131,19 +101,7 @@ try:
                         samplerate=samplerate):
         while True:
             pass
-           # print("iterating stream")
-            # response = input()
-            # if response in ('', 'q', 'Q'):
-            #     break
-            # for ch in response:
-            #     if ch == '+':
-            #         args.gain *= 2
-            #     elif ch == '-':
-            #         args.gain /= 2
-            #     else:
-            #         print('\x1b[31;40m', usage_line.center(args.columns, '#'),
-            #               '\x1b[0m', sep='')
-            #         break
+
 except KeyboardInterrupt:
     parser.exit('Interrupted by user')
 except Exception as e:
