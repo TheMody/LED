@@ -9,12 +9,9 @@ import sounddevice as sd
 #import time as pytime
 from stripsfunctions import stripManager
 from gpiozero import Button
-
+from screeninfo import get_monitors
 
 usage_line = ' press <enter> to quit, +<enter> or -<enter> to change scaling '
-
-
-
 
 
 def int_or_str(text):
@@ -66,7 +63,7 @@ low, high = args.range
 if high <= low:
     parser.error('HIGH must be greater than LOW')
 
-test = True
+test = bool(get_monitors())
 
 
 try:
