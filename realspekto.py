@@ -71,6 +71,7 @@ if high <= low:
 colors = 30, 34, 35, 91, 93, 97
 chars = ' :%#\t#%:'
 gradient = []
+test = True
 for bg, fg in zip(colors, colors[1:]):
     for char in chars:
         if char == '\t':
@@ -83,9 +84,11 @@ try:
     delta_f = (high - low) / (striplength- 1)
     fftsize = math.ceil(samplerate / delta_f)
     low_bin = math.floor(low / delta_f)
-    sManager = stripManager(stripshape,samplerate, fftsize, low_bin ,test = True)
+    sManager = stripManager(stripshape,samplerate, fftsize, low_bin ,test = test)
     buffer = []
-    button = Button(17)
+    if not test:
+        button = Button(17)
+        button.when_pressed = sManager.changevisualization
 
 
     def callback(indata, frames, time, status):
@@ -137,9 +140,6 @@ try:
                         blocksize=int(samplerate * args.block_duration / 1000),
                         samplerate=samplerate):
         while True:
-            if button.is_pressed:
-                print("button pressed")
-                sManager.changevisualization()
             pass
            # print("iterating stream")
             # response = input()
