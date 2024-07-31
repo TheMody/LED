@@ -60,7 +60,7 @@ parser.add_argument(
     help='frequency range (default %(default)s Hz)')
 args = parser.parse_args(remaining)
 #stripshape = [[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6]]
-stripshape = [[12,12,12,10,6,3]]
+stripshape = [[12,12,12,10,6,3],[12,12,12,10,6,3],[6,10,12,12,12,10,6]]
 striplength = np.max(stripshape)
 low, high = args.range
 if high <= low:
@@ -136,7 +136,8 @@ try:
                         blocksize=int(samplerate * args.block_duration / 1000),
                         samplerate=samplerate):
         while True:
-            print("iterating stream")
+            pass
+            #print("iterating stream")
             # response = input()
             # if response in ('', 'q', 'Q'):
             #     break

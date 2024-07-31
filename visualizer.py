@@ -20,7 +20,7 @@ class display():
     def draw_led_grid(self,screen, grid, margin = 20, led_size = 20):
       #  grid = np.asarray(grid)
       #  print(grid.shape)
-      screen.fill((0, 0, 0))
+      screen.fill((50, 10, 0))
       for i,block in enumerate(grid):
         for x,row in enumerate(block):
             for y,entry in enumerate(row):
@@ -32,7 +32,7 @@ class display():
                 pygame.draw.rect(
                     screen,
                     color,
-                    [(margin + led_size) * x + margin,
+                    [(margin + led_size) * x + margin +i*300,
                     (margin + led_size) * y + margin,
                     led_size, led_size]
                 )
