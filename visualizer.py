@@ -14,18 +14,37 @@ class display():
     def __delete__(self):
         pygame.quit()
 
-    def draw(self, grid, layout):
-        self.draw_led_grid(self.screen, grid, layout)
+    def draw(self, grid, layout, stripoffset):
+        self.draw_led_grid(self.screen, grid, layout,stripoffset)
     # Function to draw the LED grid
-    def draw_led_grid(self,screen, grid, layout,  margin = 20, led_size = 20):
+    def draw_led_grid(self,screen, grid, layout, stripoffset, margin = 20, led_size = 20):
       #  grid = np.asarray(grid)
       #  print(grid.shape)
       screen.fill((50, 10, 0))
-     # print(grid)
+   #   print(grid.shape)
+    #  print(stripoffset)
+      for x,row in enumerate(grid):
+                for y,entry in enumerate(row):
+                #  print(x,y+stripoffset[i][x])
+                    entry = grid[x,y]
+                    color = (int(entry*255), int(entry*255), int(entry*255))
+            #       print(color)
+                    # print("rect", [(margin + led_size) * x + margin,
+                    #     (margin + led_size) * y + margin,
+                    #     led_size, led_size])
+                    pygame.draw.rect(
+                        screen,
+                        color,
+                        [(margin + led_size) * x + margin,
+                        (margin + led_size) * (y) + margin,
+                        led_size, led_size]
+                    )
+
       for i,block in enumerate(layout):
         for x,row in enumerate(block):
             for y in range(row):
-                entry = grid[x,y]
+              #  print(x,y+stripoffset[i][x])
+                entry = grid[x,y+stripoffset[i][x]]
                 color = (int(entry*255), int(entry*255), int(entry*255))
          #       print(color)
                 # print("rect", [(margin + led_size) * x + margin,
@@ -34,8 +53,8 @@ class display():
                 pygame.draw.rect(
                     screen,
                     color,
-                    [(margin + led_size) * x + margin +i*300,
-                    (margin + led_size) * y + margin,
+                    [(margin + led_size) * x + margin +(i+1)*300,
+                    (margin + led_size) * (y+stripoffset[i][x]) + margin,
                     led_size, led_size]
                 )
 

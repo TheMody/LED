@@ -57,7 +57,8 @@ parser.add_argument(
     help='frequency range (default %(default)s Hz)')
 args = parser.parse_args(remaining)
 #stripshape = [[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6]]
-stripshape = [[12,12,12,10,6,3],[12,12,12,10,6,3],[6,10,12,12,12,10,6]]
+stripshape = [[12,12,12,10,6,3],[12,12,12,10,6,3],[6,10,12,12,12,10,6],[6,10,12,12,12,10,6]]
+stripoffset = [[0,0,0,0,0,0], [0,0,0,0,0,0], [3,1,0,0,0,1,3], [3,1,0,0,0,1,3]]
 striplength = 0
 for i in stripshape:
     for j in i:
@@ -78,7 +79,7 @@ try:
     delta_f = (high - low) / (striplength- 1)
     fftsize = math.ceil(samplerate / delta_f)
     low_bin = math.floor(low / delta_f)
-    sManager = stripManager(stripshape,samplerate, fftsize, low_bin ,test = test)
+    sManager = stripManager(stripshape, stripoffset,samplerate, fftsize, low_bin ,test = test)
     buffer = []
     if not test:
         button = Button(17)
