@@ -8,13 +8,10 @@ import numpy as np
 import sounddevice as sd
 #import time as pytime
 from stripsfunctions import stripManager
-
-
+from gpiozero import Button
+from screeninfo import get_monitors
 
 usage_line = ' press <enter> to quit, +<enter> or -<enter> to change scaling '
-
-
-
 
 
 def int_or_str(text):
@@ -61,30 +58,31 @@ parser.add_argument(
 args = parser.parse_args(remaining)
 #stripshape = [[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6]]
 stripshape = [[12,12,12,10,6,3],[12,12,12,10,6,3],[6,10,12,12,12,10,6]]
-striplength = np.max(stripshape)
+striplength = 0
+for i in stripshape:
+    for j in i:
+        if j > striplength:
+            striplength = j
+#print(stripshape)
+#striplength = np.max(np.asarray(stripshape))
+#print("max strip length: ",striplength)
 low, high = args.range
 if high <= low:
     parser.error('HIGH must be greater than LOW')
 
-# Create a nice output gradient using ANSI escape sequences.
-# Stolen from https://gist.github.com/maurisvh/df919538bcef391bc89f
-colors = 30, 34, 35, 91, 93, 97
-chars = ' :%#\t#%:'
-gradient = []
-for bg, fg in zip(colors, colors[1:]):
-    for char in chars:
-        if char == '\t':
-            bg, fg = fg, bg
-        else:
-            gradient.append(f'\x1b[{fg};{bg + 10}m{char}')
+test = bool(get_monitors())
+
 
 try:
     samplerate = sd.query_devices(args.device, 'input')['default_samplerate']
     delta_f = (high - low) / (striplength- 1)
     fftsize = math.ceil(samplerate / delta_f)
     low_bin = math.floor(low / delta_f)
-    sManager = stripManager(stripshape,samplerate, fftsize, low_bin ,test = True)
+    sManager = stripManager(stripshape,samplerate, fftsize, low_bin ,test = test)
     buffer = []
+    if not test:
+        button = Button(17)
+        button.when_pressed = sManager.changevisualization
 
 
     def callback(indata, frames, time, status):
@@ -98,36 +96,6 @@ try:
             if len(buffer) > 10000:
                 sManager.visualize(np.asarray(buffer))
                 buffer = []
-            
-        #     magnitude = np.abs(np.fft.rfft(indata[:, 0], n=fftsize))
-        #     magnitude *= args.gain / fftsize
-        #     spektogram = np.clip(magnitude[low_bin:low_bin + args.columns], 0, 1)
-        #     spektohist = np.append(spektohist, [spektogram], axis=0)
-        #     if spektohist.shape[0] > 100:
-        #         spektohist = np.delete(spektohist, 0, 0)
-        #     if np.mean(spektogram[:5]) > 0.3:
-        #         print("bass")
-            
-        #     #print(len(find_peaks(spektogram,0.4,10)))
-        #     spektosum = np.sum(spektogram)
-        #     meanfreq = np.sum(spektogram/spektosum * np.arange(0,len(spektogram)))
-        #     meanmeanfreq = meanmeanfreq*beta + meanfreq*(1-beta)
-        #   #  print(meanmeanfreq)
-        #     long_avg = long_avg*beta + spektosum*(1-beta)
-        #    # print(long_avg)
-        #     if long_avg < 3 and waittime + 2 < pytime.time():
-        #         args.gain *= 1.5
-        #         waittime = pytime.time()
-        #         print("adjusted gain to", args.gain)
-        #     if long_avg > 8 and waittime + 2 < pytime.time():
-        #         args.gain /= 1.5
-        #         waittime = pytime.time()
-        #         print("adjusted gain to", args.gain)
-        #     line = (gradient[int(np.clip(x, 0, 1) * (len(gradient) - 1))]
-        #             for x in magnitude[low_bin:low_bin + args.columns])
-
-            
-        #     print(*line, sep='', end='\x1b[0m\n')
         else:
             print('no input')
 
@@ -137,19 +105,7 @@ try:
                         samplerate=samplerate):
         while True:
             pass
-            #print("iterating stream")
-            # response = input()
-            # if response in ('', 'q', 'Q'):
-            #     break
-            # for ch in response:
-            #     if ch == '+':
-            #         args.gain *= 2
-            #     elif ch == '-':
-            #         args.gain /= 2
-            #     else:
-            #         print('\x1b[31;40m', usage_line.center(args.columns, '#'),
-            #               '\x1b[0m', sep='')
-            #         break
+
 except KeyboardInterrupt:
     parser.exit('Interrupted by user')
 except Exception as e:

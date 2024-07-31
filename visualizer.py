@@ -6,7 +6,7 @@ import numpy as np
 class display():
     def __init__(self) -> None:
         pygame.init()
-        display_width, display_height = 800, 600
+        display_width, display_height = 1200, 600
 
         self.screen = pygame.display.set_mode((display_width, display_height))
         pygame.display.set_caption('Dynamic LED Display')
@@ -14,16 +14,18 @@ class display():
     def __delete__(self):
         pygame.quit()
 
-    def draw(self, grid):
-        self.draw_led_grid(self.screen, grid)
+    def draw(self, grid, layout):
+        self.draw_led_grid(self.screen, grid, layout)
     # Function to draw the LED grid
-    def draw_led_grid(self,screen, grid, margin = 20, led_size = 20):
+    def draw_led_grid(self,screen, grid, layout,  margin = 20, led_size = 20):
       #  grid = np.asarray(grid)
       #  print(grid.shape)
       screen.fill((50, 10, 0))
-      for i,block in enumerate(grid):
+     # print(grid)
+      for i,block in enumerate(layout):
         for x,row in enumerate(block):
-            for y,entry in enumerate(row):
+            for y in range(row):
+                entry = grid[x,y]
                 color = (int(entry*255), int(entry*255), int(entry*255))
          #       print(color)
                 # print("rect", [(margin + led_size) * x + margin,
