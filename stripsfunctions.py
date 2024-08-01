@@ -112,8 +112,9 @@ class stripManager():
 
 ### layout is an array of chunks defining the strip configuration:
     # strips are configured in chunks which are defined as 2D arrays which are defining the number of strips as well as the number of pixels per strip
-    def __init__(self, layout,samplerate ,fftsize, low_bin,test = False, gain = 10):
+    def __init__(self, layout, stripoffset,samplerate ,fftsize, low_bin,test = False, gain = 10):
         self.layout = layout
+        self.stripoffset = stripoffset
         self.chunks = [chunk for chunk in self.layout]
         self.max_width = np.max([len(chunk) for chunk in self.layout])
         self.lines = [line for chunk in self.layout for line in chunk]
@@ -144,7 +145,7 @@ class stripManager():
         self.waittime =  time.time()
         self.long_avg = 100
         
-        self.spektohist = np.zeros((50,12))
+        self.spektohist = np.zeros((20,12))
         self.meanmeanfreq = 0
 
     def changevisualization(self):
@@ -159,7 +160,7 @@ class stripManager():
 
 
     def visualize(self,indata):
-        print(len(indata))
+     #   print(len(indata))
         starttime = time.time()
      #   self.displays.draw([[[0.5,1,0]]])
         beta = 0.9
@@ -201,10 +202,11 @@ class stripManager():
         #     self.gain /= 1.5
         #     self.waittime = time.time()
         #     print("adjusted gain to", self.gain)
-        print(self.spektohist.shape)
+      #  print(self.spektohist.shape)
         if self.mode == "fillchunksbyspekto":
             for i in range(self.max_width):
-                self.pixel_values[i,:] =  self.spektohist[-i,:]
+                self.pixel_values[i,:] =  self.spektohist[-i-1,:]
+      #  print(self.spektohist)
             #   for k,chunk in enumerate(self.layout):
             #         for a,line in enumerate(chunk):
             #                 self.pixel_values[k][a] = [np.mean(self.spektohist[-(a+1),int(i*len(spektogram)/line):int((i+1)*len(spektogram)/line)]) for i in range(line)]
@@ -217,7 +219,7 @@ class stripManager():
             #         for a,line in enumerate(chunk):
             #                 self.pixel_values[k][a] = [np.mean(self.spektohist[-((a+1)*5+1):-((a)*5+1),:], axis = (0,1))*3 for i in range(line)]
 
-        print(np.mean(self.spektohist[-i]))
+     #   print(np.mean(self.spektohist[-i]))
         if self.mode == "fillchunksbymagcurrent":
             for i in range(self.max_width):
                 self.pixel_values[:,:] =  np.mean(self.spektohist[-i])
@@ -255,13 +257,14 @@ class stripManager():
           #  print()
         #    self.displays.draw([[[0.5,1,0]]])
           # print
-           # self.displays.draw(self.pixel_values)
-            for k,chunk in enumerate(self.layout):
-                    printline = ""
-                    for a,line in enumerate(chunk):
-                     #   print(self.pixel_values[k,a])
-                        printline = printline + "".join([vishelper[int(self.pixel_values[a,x] * (len(vishelper) - 1))] for x in range(line)]) + "\n"  
-                    print(printline, sep='')
+            
+            self.displays.draw(self.pixel_values, layout = self.layout, stripoffset = self.stripoffset)
+            # for k,chunk in enumerate(self.layout):
+            #         printline = ""
+            #         for a,line in enumerate(chunk):
+            #          #   print(self.pixel_values[k,a])
+            #             printline = printline + "".join([vishelper[int(self.pixel_values[a,x] * (len(vishelper) - 1))] for x in range(line)]) + "\n"  
+            #         print(printline, sep='')
 
         else:
         #    print("test")
@@ -271,10 +274,12 @@ class stripManager():
                 for a,line in enumerate(chunk):
                     invert = not invert
                     for i in range(line):
+                        x = a
+                        y = i + self.stripoffset[k][a]
                         if invert:
-                            color = Color(int(self.pixel_values[a][-i]*255),int(self.pixel_values[a][-i]*255),int(self.pixel_values[a][-i]*255))
+                            color = Color(int(self.pixel_values[x,-y-1]*255),int(self.pixel_values[x,-y-1]*255),int(self.pixel_values[x,-y-1]*255))
                         else:
-                            color = Color(int(self.pixel_values[a][i]*255),int(self.pixel_values[a][i]*255),int(self.pixel_values[a][i]*255))
+                            color = Color(int(self.pixel_values[x,y]*255),int(self.pixel_values[x,y]*255),int(self.pixel_values[x,y]*255))
                         if not pos  >= self.num_leds: 
                             self.strip.setPixelColor(pos, color)
                         pos = pos + 1
