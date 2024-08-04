@@ -270,8 +270,9 @@ class stripManager():
         else:
         #    print("test")
             pos = 0
-            invert = True
+         #   invert = True
             for k,chunk in enumerate(self.layout):
+                invert = True
                 for a,line in enumerate(chunk):
                     invert = not invert
                     for i in range(line):
