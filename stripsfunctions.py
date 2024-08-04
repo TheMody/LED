@@ -124,7 +124,8 @@ class stripManager():
         self.low_bin = low_bin
         self.samplerate = samplerate
         self.fftsize = fftsize
-        self.num_leds = np.sum(self.layout)
+        self.num_leds = np.sum([np.sum(partiallayout) for partiallayout in self.layout])
+        print("num_leds", self.num_leds)
         self.mode = "fillchunksbyspekto"
         self.pixel_values = np.zeros((self.max_width,self.max_length))
         #self.pixel_values = [[[0 for pixel in range(line)] for line in chunk] for chunk in self.layout]
