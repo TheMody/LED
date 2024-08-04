@@ -125,14 +125,10 @@ class stripManager():
         self.samplerate = samplerate
         self.fftsize = fftsize
         self.num_leds = np.sum([np.sum(partiallayout) for partiallayout in self.layout])
+        self.max_value = 0
         print("num_leds", self.num_leds)
         self.mode = "fillchunksbyspekto"
         self.pixel_values = np.zeros((self.max_width,self.max_length))
-        #self.pixel_values = [[[0 for pixel in range(line)] for line in chunk] for chunk in self.layout]
-        #[[ PixelStrip(self.num_leds, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
-         #for led_count in chunk] for chunk in self.layout ]
-        #PixelStrip(300, 18, 800000, 5, False, 255, 0)
-        print(test)
         if not test:    
             self.visualizeascii = False
             self.strip = PixelStrip(int(self.num_leds), LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
@@ -141,7 +137,6 @@ class stripManager():
             self.visualizeascii = True
             import visualizer
             self.displays = visualizer.display()
-          #  self.display = visualize.display()
 
         self.waittime =  time.time()
         self.long_avg = 100
@@ -161,104 +156,53 @@ class stripManager():
 
 
     def visualize(self,indata):
-     #   print(len(indata))
         starttime = time.time()
-     #   self.displays.draw([[[0.5,1,0]]])
         beta = 0.9
         magnitude = np.abs(np.fft.rfft(indata, n=self.fftsize))
-       # magnitude *= self.gain / self.fftsize
-       # print(self.low_bin)
-        #average the magnitude over the bins
-        spektogram = average_into_bins(magnitude[:55], self.max_length)
-        #spektogram = magnitude[:55]#np.clip(, 0, 1) #
 
-        print("time it took for fft", time.time() - starttime)
-        starttime = time.time()
+        #average the magnitude over the bins
+        spektogram = average_into_bins(magnitude[:50], self.max_length)
+
+      #  print("time it took for fft", time.time() - starttime)
+       # starttime = time.time()
 
         self.spektohist = np.append(self.spektohist, [spektogram], axis=0)
         if self.spektohist.shape[0] > 20:
             self.spektohist = np.delete(self.spektohist, 0, 0)
 
-        print("time it took for appending spekto", time.time() - starttime)
-        starttime = time.time()
-        # if np.mean(spektogram[:int(self.num_leds/16)]) > 0.3:
-        #     print("bass")
-        
-        #print(len(find_peaks(spektogram,0.4,10)))
-       # spektosum = np.sum(spektogram)
-      #  meanfreq = np.sum(spektogram/spektosum * np.arange(0,len(spektogram)))
-       # meanmeanfreq = meanmeanfreq*beta + meanfreq*(1-beta)
-        #  print(meanmeanfreq)
         self.long_avg = self.long_avg*beta + np.sum(magnitude)*(1-beta)
 
 
-        print("time it took for stuff", time.time() - starttime)
-        starttime = time.time()
-        # print(long_avg)
-        # if self.long_avg < 3 and self.waittime + 2 < time.time():
-        #     self.gain *= 1.5
-        #     self.waittime = time.time()
-        #     print("adjusted gain to", self.gain)
-        # if self.long_avg > 8 and self.waittime + 2 < time.time():
-        #     self.gain /= 1.5
-        #     self.waittime = time.time()
-        #     print("adjusted gain to", self.gain)
-      #  print(self.spektohist.shape)
+        #print("time it took for stuff", time.time() - starttime)
+        #starttime = time.time()
+
         if self.mode == "fillchunksbyspekto":
             for i in range(self.max_width):
                 self.pixel_values[i,:] =  self.spektohist[-i-1,:]
-      #  print(self.spektohist)
-            #   for k,chunk in enumerate(self.layout):
-            #         for a,line in enumerate(chunk):
-            #                 self.pixel_values[k][a] = [np.mean(self.spektohist[-(a+1),int(i*len(spektogram)/line):int((i+1)*len(spektogram)/line)]) for i in range(line)]
-                          #  self.pixel_values[k][a] = [np.mean(self.spektohist[-((a+1)*5+1):-((a)*5+1),int(i*len(spektogram)/line):int((i+1)*len(spektogram)/line)], axis = (0,1)) for i in range(line)]
-        
+ 
         if self.mode == "fillchunksbymag":
             for i in range(self.max_width):
                 self.pixel_values[i,:] =  np.mean(self.spektohist[-i,:])
-            #   for k,chunk in enumerate(self.layout):
-            #         for a,line in enumerate(chunk):
-            #                 self.pixel_values[k][a] = [np.mean(self.spektohist[-((a+1)*5+1):-((a)*5+1),:], axis = (0,1))*3 for i in range(line)]
 
-     #   print(np.mean(self.spektohist[-i]))
         if self.mode == "fillchunksbymagcurrent":
             for i in range(self.max_width):
                 self.pixel_values[:,:] =  np.mean(self.spektohist[-i])
-            #   for k,chunk in enumerate(self.layout):
-            #         for a,line in enumerate(chunk):
-            #                 self.pixel_values[k][a] = [np.mean(self.spektohist[0], axis = (0))*3 for i in range(line)]
-        
-        print("time it took for pixel wise assignemnt", time.time() - starttime)
-        starttime = time.time()
-        
-        # min_val = 0
-        # max_val = 0
-        # for chunk in self.pixel_values:
-        #     for line in chunk:
-        #         for pixel in line:
-        #             if pixel > max_val:
-        #                 max_val = pixel
-        #             if pixel < min_val:
-        #                 min_val = pixel
 
+       # print("time it took for pixel wise assignemnt", time.time() - starttime)
+       # starttime = time.time()
 
-
-       # print("min", min_val, "max", max_val)
         max_val = np.max(self.pixel_values)
         min_val = np.min(self.pixel_values)
-
+        self.max_value *= 0.96
+        self.max_value = max(self.max_value, max_val)
+        max_val = self.max_value
         if not max_val - min_val == 0:
             self.pixel_values = (self.pixel_values - min_val)/(max_val - min_val)
-           # self.pixel_values = [[[(pixel - min_val)/(max_val - min_val) for pixel in line] for line in chunk] for chunk in self.pixel_values]
-       
-        print("time it took for normalization", time.time() - starttime)
-        starttime = time.time()
+
+     #   print("time it took for normalization", time.time() - starttime)
+      #  starttime = time.time()
         if self.visualizeascii:
-         #   print(self.pixel_values )
-          #  print()
-        #    self.displays.draw([[[0.5,1,0]]])
-          # print
-            
+
             self.displays.draw(self.pixel_values, layout = self.layout, stripoffset = self.stripoffset)
             # for k,chunk in enumerate(self.layout):
             #         printline = ""
@@ -268,9 +212,7 @@ class stripManager():
             #         print(printline, sep='')
 
         else:
-        #    print("test")
             pos = 0
-         #   invert = True
             for k,chunk in enumerate(self.layout):
                 invert = True
                 for a,line in enumerate(chunk):
@@ -286,12 +228,8 @@ class stripManager():
                             self.strip.setPixelColor(pos, color)
                         pos = pos + 1
                 self.strip.show()
-            #     time.sleep(0.01)
-            # for i in range(self.strip.numPixels()):
-            #     self.strip.setPixelColor(i,  Color(255, 255, 255))
-            # self.strip.show()
-        print("time it took for visualization", time.time() - starttime)
-        starttime = time.time()
+     #   print("time it took for visualization", time.time() - starttime)
+      #  starttime = time.time()
 
     def __delete__(self):
         colorWipe(self.strip, Color(0, 0, 0))
