@@ -127,7 +127,8 @@ class stripManager():
         self.num_leds = np.sum([np.sum(partiallayout) for partiallayout in self.layout])
         self.max_value = 0
         print("num_leds", self.num_leds)
-        self.mode = "fillchunksbyspekto"
+        self.mode = "startup"#"fillchunksbyspekto"
+        self.startuptime = 0
         self.pixel_values = np.zeros((self.max_width,self.max_length))
         if not test:    
             self.visualizeascii = False
@@ -175,7 +176,14 @@ class stripManager():
 
         #print("time it took for stuff", time.time() - starttime)
         #starttime = time.time()
-
+        if self.mode == "startup":
+            #for i in range(self.max_width):
+            for a in range(self.max_length):
+                self.pixel_values[:,-a-1] =  1 if a <= self.startuptime else 0#np.mean(self.spektohist[-i,:])
+        self.startuptime += 1
+        if self.startuptime >= self.max_length+5:
+            self.mode = "fillchunksbyspekto"
+            self.startuptime = 0
         if self.mode == "fillchunksbyspekto":
             for i in range(self.max_width):
                 self.pixel_values[i,:] =  self.spektohist[-i-1,:]

@@ -94,7 +94,7 @@ try:
                   '\x1b[0m', sep='')
         if any(indata):
             buffer = buffer + list(indata[:, 0])
-            if len(buffer) > 10000:
+            if len(buffer) > 4000:
                 sManager.visualize(np.asarray(buffer))
                 buffer = []
         else:
