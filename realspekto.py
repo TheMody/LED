@@ -53,7 +53,7 @@ parser.add_argument(
     help='initial gain factor (default %(default)s)')
 parser.add_argument(
     '-r', '--range', type=float, nargs=2,
-    metavar=('LOW', 'HIGH'), default=[50, 500],
+    metavar=('LOW', 'HIGH'), default=[10, 500],
     help='frequency range (default %(default)s Hz)')
 args = parser.parse_args(remaining)
 #stripshape = [[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6],[6,6,6]]

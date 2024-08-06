@@ -101,11 +101,19 @@ for bg, fg in zip(colors, colors[1:]):
 
 def average_into_bins(arr, n_bins):
     # Ensure the array can be divided into bins evenly
-    bin_size = len(arr) // n_bins
+  #  bin_size = len(arr) // n_bins
     # Reshape the array to have n_bins rows and bin_size columns
-    reshaped_arr = arr[:bin_size * n_bins].reshape(n_bins, bin_size)
+  #  reshaped_arr = arr[:bin_size * n_bins].reshape(n_bins, bin_size)
+    bin_length = 2
+    bins = []
+    pos = 0
+    for i in range(0,n_bins):
+        bins.append(arr[pos:int(pos+bin_length)].mean())
+        pos += int(bin_length)
+        bin_length *= 1.15
+        #print(pos)
     # Calculate the mean for each bin
-    bin_averages = reshaped_arr.mean(axis=1)
+    bin_averages = np.asarray(bins)
     return bin_averages
 
 class stripManager():
@@ -162,7 +170,8 @@ class stripManager():
         magnitude = np.abs(np.fft.rfft(indata, n=self.fftsize))
 
         #average the magnitude over the bins
-        spektogram = average_into_bins(magnitude[:50], self.max_length)
+        spektogram = average_into_bins(magnitude[:70], self.max_length)
+     #   print(spektogram)
 
       #  print("time it took for fft", time.time() - starttime)
        # starttime = time.time()
@@ -170,9 +179,6 @@ class stripManager():
         self.spektohist = np.append(self.spektohist, [spektogram], axis=0)
         if self.spektohist.shape[0] > 20:
             self.spektohist = np.delete(self.spektohist, 0, 0)
-
-        self.long_avg = self.long_avg*beta + np.sum(magnitude)*(1-beta)
-
 
         #print("time it took for stuff", time.time() - starttime)
         #starttime = time.time()
@@ -190,28 +196,37 @@ class stripManager():
  
         if self.mode == "fillchunksbymag":
             for i in range(self.max_width):
-                self.pixel_values[i,:] =  np.mean(self.spektohist[-i,:])
+                self.pixel_values[i,:] =  np.mean(self.spektohist[-i-1,:])
 
         if self.mode == "fillchunksbymagcurrent":
             for i in range(self.max_width):
-                self.pixel_values[:,:] =  np.mean(self.spektohist[-i])
-
+                self.pixel_values[i,:] =  np.mean(self.spektohist[-1,:])
+            self.max_value = 0.98 * self.max_value + 0.02 * np.max(self.pixel_values)
+            self.pixel_values = self.pixel_values / self.max_value
+            self.pixel_values = np.clip(self.pixel_values, 0, 1)
+        else:
        # print("time it took for pixel wise assignemnt", time.time() - starttime)
        # starttime = time.time()
-
-        max_val = np.max(self.pixel_values)
-        min_val = np.min(self.pixel_values)
-        self.max_value *= 0.96
-        self.max_value = max(self.max_value, max_val)
-        max_val = self.max_value
-        if not max_val - min_val == 0:
-            self.pixel_values = (self.pixel_values - min_val)/(max_val - min_val)
-
+            max_val = np.max(self.pixel_values)
+            min_val = np.min(self.pixel_values)
+            self.max_value *= 0.96
+            self.max_value = max(self.max_value, max_val)
+            max_val = self.max_value
+            if not max_val - min_val <= 0:
+                self.pixel_values = (self.pixel_values - min_val)/(max_val - min_val)
+        # if np.min(self.pixel_values) < 0:
+        #     print("min value is", np.min(self.pixel_values))
+        # if np.max(self.pixel_values) > 1:
+        #     print("max value is", np.max(self.pixel_values))
+            #self.pixel_values = self.pixel_values - np.min(self.pixel_values)
      #   print("time it took for normalization", time.time() - starttime)
       #  starttime = time.time()
+
+        self.pixel_values *= 255
+        self.pixel_values = np.asarray(self.pixel_values, dtype = int)
         if self.visualizeascii:
 
-            self.displays.draw(self.pixel_values, layout = self.layout, stripoffset = self.stripoffset)
+            self.displays.draw(self.pixel_values/255.0, layout = self.layout, stripoffset = self.stripoffset)
             # for k,chunk in enumerate(self.layout):
             #         printline = ""
             #         for a,line in enumerate(chunk):
@@ -229,9 +244,9 @@ class stripManager():
                         x = a
                         y = i + self.stripoffset[k][a]
                         if invert:
-                            color = Color(int(self.pixel_values[x,-y-1]*255),int(self.pixel_values[x,-y-1]*255),int(self.pixel_values[x,-y-1]*255))
+                            color = Color(self.pixel_values[x,-y-1],self.pixel_values[x,-y-1],self.pixel_values[x,-y-1])
                         else:
-                            color = Color(int(self.pixel_values[x,y]*255),int(self.pixel_values[x,y]*255),int(self.pixel_values[x,y]*255))
+                            color = Color(self.pixel_values[x,y],self.pixel_values[x,y],self.pixel_values[x,y])
                         if not pos  >= self.num_leds: 
                             self.strip.setPixelColor(pos, color)
                         pos = pos + 1
